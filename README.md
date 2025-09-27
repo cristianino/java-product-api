@@ -1,4 +1,11 @@
-# Java Pro- **📖 [API Documentation](http://localhost:8080/swagger-ui/index.html)** - Interactive Swagger UI (when running)
+# Java Pro- **📖 [API - **🔐 API Key security** via X-API-Key header
+- **📋 API Versioning** with multiple concurrent versions (v1, v2) and backward compatibility
+- **🐘 PostgreSQL** persistence with JPA
+- **🔄 Flyway** database migrations  
+- **📚 Swagger/OpenAPI** documentation with microservice examples
+- **💊 Health checks** with microservice connectivity monitoring
+- **🔗 Connectivity endpoints** for verifying communication with other microservices
+- **📝 Structured JSON logging** for Loki/Grafanatation](http://localhost:8080/swagger-ui/index.html)** - Interactive Swagger UI (when running)
 - **🏥 [Health Check](http://localhost:8080/actuator/health)** - Application health status
 - **🔗 [Connectivity Status](http://localhost:8080/api/connectivity/status)** - Microservice connectivity monitoringct API
 
@@ -176,6 +183,106 @@ This connectivity feature is essential for:
 - **🔍 Integration testing** and CI/CD pipelines  
 - **📊 Service mesh observability**
 - **⚡ Quick troubleshooting** of service dependencies
+
+## 📋 API Versioning Strategy
+
+The API implements **URI Path Versioning** for clear version management and backward compatibility.
+
+### Available API Versions
+
+#### 🆕 Version 2.0 (Current - Recommended)
+**Base Path:** `/api/v2/products`
+
+**Enhanced Features:**
+- **Pagination support** with `page` and `size` parameters
+- **Enhanced metadata** in responses (timestamps, version info)
+- **Improved error handling** with detailed error codes
+- **Additional HATEOAS links** (edit, delete, collection)
+- **Version-specific health endpoint** (`/api/v2/products/health`)
+
+```bash
+# Get products with pagination
+curl -H "X-API-Key: your-secret-api-key-here" \
+     "http://localhost:8080/api/v2/products?page=0&size=10"
+
+# Enhanced response includes:
+{
+  "data": [...],
+  "links": {
+    "self": "/api/v2/products?page=0&size=10",
+    "first": "/api/v2/products?page=0&size=10",
+    "last": "/api/v2/products?page=2&size=10"
+  },
+  "meta": {
+    "version": "2.0",
+    "page": 0,
+    "size": 10,
+    "total_pages": 3,
+    "features": ["pagination", "filtering", "enhanced_metadata"],
+    "api_version": "v2"
+  }
+}
+```
+
+#### 🔄 Version 1.0 (Stable)
+**Base Path:** `/api/v1/products`
+
+**Standard Features:**
+- **Basic CRUD operations** with JSON:API format
+- **Simple metadata** and links
+- **Standard error handling**
+
+```bash
+# Basic usage
+curl -H "X-API-Key: your-secret-api-key-here" \
+     "http://localhost:8080/api/v1/products"
+
+# Response format:
+{
+  "data": [...],
+  "links": {"self": "/api/v1/products"},
+  "meta": {"version": "1.0", "count": 5}
+}
+```
+
+#### ⚠️ Legacy Version (Deprecated)
+**Base Path:** `/api/products`
+
+- **Backward compatibility** maintained
+- **Deprecated warnings** in documentation
+- **Redirects to latest version** behavior
+
+### Version Selection Guidelines
+
+| Use Case | Recommended Version | Reason |
+|----------|-------------------|---------|
+| **New integrations** | `v2` | Latest features, best performance |
+| **Existing stable integrations** | `v1` | Proven stability, no breaking changes |
+| **Legacy systems** | `/api/products` | Backward compatibility during migration |
+
+### API Documentation by Version
+
+The Swagger UI provides separate documentation for each version:
+
+- **📖 All Versions:** http://localhost:8080/swagger-ui.html
+- **🆕 V2.0 Products:** Select "Products API V2.0 (Current)" group
+- **🔄 V1.0 Products:** Select "Products API V1.0" group  
+- **⚠️ Legacy:** Select "Legacy API (Deprecated)" group
+- **🔗 Connectivity:** Select "Connectivity & Health" group
+
+### Version Migration Strategy
+
+**Backward Compatibility Promise:**
+- ✅ **V1 endpoints** will remain functional
+- ✅ **Response format** stays consistent within versions
+- ✅ **Breaking changes** only in new major versions
+- ✅ **Deprecation notices** provided 6+ months in advance
+
+**Migration Path:**
+1. **Assess current usage** of legacy endpoints
+2. **Test V2 endpoints** in development environment
+3. **Gradual migration** of integrations to V2
+4. **Monitor both versions** during transition period
 
 ### Local Development
 
@@ -392,7 +499,9 @@ docker run -p 8080:8080 \
 | `docker compose -f docker-compose.dev.yml up -d` | Start full application stack |
 | `mvn clean test jacoco:report` | Run all tests with coverage |
 | `mvn spring-boot:run` | Start application locally |
-| `curl -H "X-API-Key: your-secret-api-key-here" http://localhost:8080/api/products` | Test API |
+| `curl -H "X-API-Key: your-secret-api-key-here" http://localhost:8080/api/v2/products` | **Test V2 API (Recommended)** |
+| `curl -H "X-API-Key: your-secret-api-key-here" http://localhost:8080/api/v1/products` | Test V1 API (Stable) |
+| `curl -H "X-API-Key: your-secret-api-key-here" http://localhost:8080/api/v2/products/health` | V2 API Health Check |
 | `curl -H "X-API-Key: your-secret-api-key-here" http://localhost:8080/api/connectivity/status` | Check microservice connectivity |
 | `curl -H "X-API-Key: your-secret-api-key-here" http://localhost:8080/api/connectivity/inventory` | Check inventory service connection |
 

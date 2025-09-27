@@ -1,9 +1,10 @@
-package com.cristianino.productapi.infrastructure.web;
+package com.cristianino.productapi.infrastructure.web.v1;
 
 import com.cristianino.productapi.application.dto.JsonApiResponse;
 import com.cristianino.productapi.application.dto.JsonApiError;
 import com.cristianino.productapi.application.dto.ProductDto;
 import com.cristianino.productapi.application.usecase.ProductUseCase;
+import com.cristianino.productapi.infrastructure.web.JsonApiRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,22 +19,19 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/products")
-@Tag(name = "Products (Legacy)", description = "Product management operations - Legacy endpoints (redirects to latest version)")
+@RequestMapping("/api/v1/products")
+@Tag(name = "Products V1", description = "Product management operations - Version 1.0")
 @SecurityRequirement(name = "X-API-Key")
-@Deprecated
-public class ProductController {
+public class ProductControllerV1 {
     
     private final ProductUseCase productUseCase;
     
-    public ProductController(ProductUseCase productUseCase) {
+    public ProductControllerV1(ProductUseCase productUseCase) {
         this.productUseCase = productUseCase;
     }
     
     @PostMapping
-    @Operation(summary = "Create a new product", 
-               description = "⚠️ DEPRECATED: Use /api/v2/products instead. This endpoint will redirect to the latest version.")
-    @Deprecated
+    @Operation(summary = "Create a new product", description = "Creates a new product using JSON:API format - Version 1.0")
     public ResponseEntity<JsonApiResponse<ProductDto>> createProduct(
             @Valid @RequestBody JsonApiRequest<ProductDto> request) {
         try {
@@ -48,12 +46,12 @@ public class ProductController {
     }
     
     @GetMapping("/{id}")
-    @Operation(summary = "Get product by ID")
+    @Operation(summary = "Get product by ID", description = "Retrieves a product by its ID - Version 1.0")
     public ResponseEntity<JsonApiResponse<ProductDto>> getProduct(
             @Parameter(description = "Product ID") @PathVariable Long id) {
         Optional<ProductDto> product = productUseCase.getProductById(id);
         if (product.isPresent()) {
-            Map<String, String> links = Map.of("self", "/api/products/" + id);
+            Map<String, String> links = Map.of("self", "/api/v1/products/" + id);
             JsonApiResponse<ProductDto> response = new JsonApiResponse<>(
                     product.get(), links, null);
             return ResponseEntity.ok(response);
@@ -65,18 +63,21 @@ public class ProductController {
     }
     
     @GetMapping
-    @Operation(summary = "Get all products")
+    @Operation(summary = "Get all products", description = "Retrieves all products with pagination support - Version 1.0")
     public ResponseEntity<JsonApiResponse<List<ProductDto>>> getAllProducts() {
         List<ProductDto> products = productUseCase.getAllProducts();
-        Map<String, String> links = Map.of("self", "/api/products");
-        Map<String, Object> meta = Map.of("count", products.size());
+        Map<String, String> links = Map.of("self", "/api/v1/products");
+        Map<String, Object> meta = Map.of(
+            "count", products.size(),
+            "version", "1.0"
+        );
         JsonApiResponse<List<ProductDto>> response = new JsonApiResponse<>(
                 products, links, meta);
         return ResponseEntity.ok(response);
     }
     
     @PutMapping("/{id}")
-    @Operation(summary = "Update product")
+    @Operation(summary = "Update product", description = "Updates an existing product - Version 1.0")
     public ResponseEntity<JsonApiResponse<ProductDto>> updateProduct(
             @Parameter(description = "Product ID") @PathVariable Long id,
             @Valid @RequestBody JsonApiRequest<ProductDto> request) {
@@ -98,7 +99,7 @@ public class ProductController {
     }
     
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete product")
+    @Operation(summary = "Delete product", description = "Deletes a product by its ID - Version 1.0")
     public ResponseEntity<Void> deleteProduct(
             @Parameter(description = "Product ID") @PathVariable Long id) {
         boolean deleted = productUseCase.deleteProduct(id);
