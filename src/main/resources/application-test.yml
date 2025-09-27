@@ -1,0 +1,50 @@
+# Configuración para testing 
+server:
+  port: 8082  # Puerto diferente para evitar conflictos
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+    
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        
+  flyway:
+    enabled: false  # Disabled for testing with H2
+    
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+logging:
+  level:
+    com.cristianino.productapi: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# Microservices configuration for testing
+microservices:
+  inventory:
+    base-url: "http://localhost:8083"  # Mock server or test instance
+    
+# Eureka disabled for testing
+eureka:
+  client:
+    enabled: false
+
+# API Key for testing
+app:
+  api:
+    key: "test-api-key-for-testing"

@@ -16,6 +16,21 @@ spring:
     enabled: true
     baseline-on-migrate: true
     
+# Microservices configuration for development
+microservices:
+  inventory:
+    base-url: "http://localhost:8081"  # Local inventory service
+    
+# Eureka configuration for development (optional)
+eureka:
+  client:
+    enabled: false  # Disable by default in dev, can be overridden
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+
 logging:
   level:
     com.cristianino.productapi: DEBUG

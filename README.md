@@ -1,10 +1,12 @@
 # Java Product API
 
-A Spring Boot 3 microservice for managing products with JSON:API specification, Hexagonal Architecture, PostgreSQL, and Docker support.
+A Spring Boot 3 microservice for managing products with **simple and clear APIs** designed for microservice communication. Features JSON:API specification, Hexagonal Architecture, PostgreSQL, and Docker support.
 
 ## 📚 Documentation
 
 - **🚀 [Developer Guide](DEVELOPER_GUIDE.md)** - Complete setup, testing, and development guide
+- **🔗 [Microservice Integration](MICROSERVICE_INTEGRATION.md)** - **Simple guide for consuming APIs**
+- **💡 [Integration Examples](INTEGRATION_EXAMPLES.md)** - **Practical examples for inventory microservice**
 - **📖 [API Documentation](http://localhost:8080/swagger-ui/index.html)** - Interactive Swagger UI (when running)
 - **🏥 [Health Check](http://localhost:8080/actuator/health)** - Application health status
 
@@ -12,16 +14,17 @@ A Spring Boot 3 microservice for managing products with JSON:API specification, 
 
 - **Spring Boot 3** with **Java 17**
 - **Hexagonal Architecture** (Domain, Application, Infrastructure layers)
-- **REST CRUD operations** for products (id, name, price)
-- **JSON:API** response format (data, links, meta, errors)
-- **API Key security** via X-API-Key header
-- **PostgreSQL** persistence with JPA
-- **Flyway** database migrations
-- **Swagger/OpenAPI** documentation
-- **Actuator** health checks
-- **Structured JSON logging** for Loki/Grafana
-- **Unit & Integration tests** with JUnit and Testcontainers
-- **Docker** support with multi-stage builds
+- **🎯 Dual API Design:**
+  - **JSON:API** endpoints for external integrations (`/api/products`)
+  - **Simple JSON** endpoints for microservice communication (`/api/internal/products`)
+- **🔐 API Key security** via X-API-Key header
+- **🐘 PostgreSQL** persistence with JPA
+- **🔄 Flyway** database migrations  
+- **📚 Swagger/OpenAPI** documentation with microservice examples
+- **💊 Health checks** with microservice connectivity monitoring
+- **📝 Structured JSON logging** for Loki/Grafana
+- **🧪 Unit & Integration tests** with JUnit and Testcontainers
+- **🐳 Docker** support with multi-environment configurations
 
 ## Architecture
 
@@ -50,6 +53,29 @@ src/main/java/com/cristianino/productapi/
 - Maven 3.6+
 - Docker & Docker Compose (for full setup)
 
+## 🚀 Simple API for Microservices
+
+This service provides **two clear API approaches**:
+
+### For Microservice Communication (Recommended)
+```bash
+# Get all products (simplified format)
+curl -H "X-API-Key: your-secret-api-key-here" \
+     http://localhost:8080/api/internal/products
+
+# Response: {"products": [{"id":1,"name":"Product","price":99.99,"availability":true}], "totalCount":1}
+```
+
+### For External Integrations (JSON:API Standard)
+```bash
+# Get products (JSON:API format)
+curl -H "X-API-Key: your-secret-api-key-here" \
+     -H "Content-Type: application/vnd.api+json" \
+     http://localhost:8080/api/products
+```
+
+**See [MICROSERVICE_INTEGRATION.md](MICROSERVICE_INTEGRATION.md) for complete integration guide.**
+
 ### Local Development
 
 1. **Clone the repository**
@@ -58,23 +84,24 @@ src/main/java/com/cristianino/productapi/
    cd java-product-api
    ```
 
-2. **Build the application**
+2. **Start with Docker (Recommended)**
    ```bash
-   mvn clean package
+   # Development environment with PostgreSQL
+   docker compose -f docker-compose.dev.yml up -d
    ```
 
-3. **Run with Docker Compose**
+   This starts the API on **port 8080** with PostgreSQL
+
+3. **Test the APIs**
    ```bash
-   docker-compose up --build
+   # Test internal API (for microservices)
+   curl -H "X-API-Key: your-secret-api-key-here" \
+        http://localhost:8080/api/internal/products
    ```
 
-   This will start:
-   - PostgreSQL database on port 5432
-   - Java Product API on port 8080
-
-4. **Access the application**
-   - API: http://localhost:8080
-   - Swagger UI: http://localhost:8080/swagger-ui.html
+4. **Access documentation**
+   - **Swagger UI:** http://localhost:8080/swagger-ui.html
+   - **Health Check:** http://localhost:8080/actuator/health
    - Health Check: http://localhost:8080/actuator/health
 
 ### API Usage
