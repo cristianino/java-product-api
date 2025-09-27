@@ -7,7 +7,8 @@ A Spring Boot 3 microservice for managing products with **simple and clear APIs*
 - **🚀 [Developer Guide](DEVELOPER_GUIDE.md)** - Complete setup, testing, and development guide
 - **🔗 [Microservice Integration](MICROSERVICE_INTEGRATION.md)** - **Simple guide for consuming APIs**
 - **💡 [Integration Examples](INTEGRATION_EXAMPLES.md)** - **Practical examples for inventory microservice**
-- **📖 [API Documentation](http://localhost:8080/swagger-ui/index.html)** - Interactive Swagger UI (when running)
+- **� [Observability Guide](OBSERVABILITY_GUIDE.md)** - **Loki + Grafana dashboard usage and monitoring**
+- **�📖 [API Documentation](http://localhost:8080/swagger-ui/index.html)** - Interactive Swagger UI (when running)
 - **🏥 [Health Check](http://localhost:8080/actuator/health)** - Application health status
 
 ## Features
@@ -255,6 +256,9 @@ http://localhost:3000
 - **Etiquetas automáticas**: `application=java-product-api`, `host`, `level`
 - **Metadatos incluidos**: timestamp, thread, logger, MDC context, excepciones
 - **Configuración dual**: logs en consola para desarrollo + Loki para producción
+
+#### 📖 Detailed Documentation:
+Para una guía completa sobre cómo usar los dashboards, interpretar las métricas y personalizar las queries, consulta la **[Observability Guide](OBSERVABILITY_GUIDE.md)**.
 - Shows application and database health
 
 ### Metrics
