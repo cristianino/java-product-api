@@ -142,4 +142,106 @@ class JsonApiErrorTest {
         assertEquals("500", internalError.getStatus());
         assertEquals("Internal Server Error", internalError.getTitle());
     }
+
+    // Tests for JsonApiErrorSource inner class
+    @Test
+    void jsonApiErrorSource_DefaultConstructor_CreatesEmptySource() {
+        // When
+        JsonApiError.JsonApiErrorSource source = new JsonApiError.JsonApiErrorSource();
+
+        // Then
+        assertNull(source.getPointer());
+        assertNull(source.getParameter());
+    }
+
+    @Test
+    void jsonApiErrorSource_PointerConstructor_CreatesSourceWithPointer() {
+        // Given
+        String pointer = "/data/attributes/name";
+
+        // When
+        JsonApiError.JsonApiErrorSource source = new JsonApiError.JsonApiErrorSource(pointer);
+
+        // Then
+        assertEquals(pointer, source.getPointer());
+        assertNull(source.getParameter());
+    }
+
+    @Test
+    void jsonApiErrorSource_SettersAndGetters_WorkCorrectly() {
+        // Given
+        JsonApiError.JsonApiErrorSource source = new JsonApiError.JsonApiErrorSource();
+        String pointer = "/data/attributes/email";
+        String parameter = "email";
+
+        // When
+        source.setPointer(pointer);
+        source.setParameter(parameter);
+
+        // Then
+        assertEquals(pointer, source.getPointer());
+        assertEquals(parameter, source.getParameter());
+    }
+
+    @Test
+    void jsonApiErrorSource_Equals_WorksCorrectly() {
+        // Given
+        JsonApiError.JsonApiErrorSource source1 = new JsonApiError.JsonApiErrorSource("/data/attributes/name");
+        source1.setParameter("name");
+
+        JsonApiError.JsonApiErrorSource source2 = new JsonApiError.JsonApiErrorSource("/data/attributes/name");
+        source2.setParameter("name");
+
+        JsonApiError.JsonApiErrorSource source3 = new JsonApiError.JsonApiErrorSource("/data/attributes/email");
+
+        // Then
+        assertEquals(source1, source2);
+        assertNotEquals(source1, source3);
+        assertNotEquals(source1, null);
+        assertNotEquals(source1, "string");
+        assertEquals(source1, source1); // reflexivity
+    }
+
+    @Test
+    void jsonApiErrorSource_HashCode_WorksCorrectly() {
+        // Given
+        JsonApiError.JsonApiErrorSource source1 = new JsonApiError.JsonApiErrorSource("/data/attributes/name");
+        source1.setParameter("name");
+
+        JsonApiError.JsonApiErrorSource source2 = new JsonApiError.JsonApiErrorSource("/data/attributes/name");
+        source2.setParameter("name");
+
+        // Then
+        assertEquals(source1.hashCode(), source2.hashCode());
+    }
+
+    @Test
+    void jsonApiErrorSource_ToString_ReturnsNonNullString() {
+        // Given
+        JsonApiError.JsonApiErrorSource source = new JsonApiError.JsonApiErrorSource("/data/attributes/name");
+        source.setParameter("name");
+
+        // When
+        String toString = source.toString();
+
+        // Then
+        assertNotNull(toString);
+        assertTrue(toString.contains("JsonApiErrorSource"));
+    }
+
+    @Test
+    void jsonApiError_WithSource_WorksCorrectly() {
+        // Given
+        JsonApiError error = new JsonApiError("422", "Validation Error", "Invalid field value");
+        JsonApiError.JsonApiErrorSource source = new JsonApiError.JsonApiErrorSource("/data/attributes/name");
+        source.setParameter("name");
+
+        // When
+        error.setSource(source);
+
+        // Then
+        assertEquals(source, error.getSource());
+        assertEquals("/data/attributes/name", error.getSource().getPointer());
+        assertEquals("name", error.getSource().getParameter());
+    }
 }
