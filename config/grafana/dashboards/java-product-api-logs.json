@@ -76,7 +76,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "sum by (level) (count_over_time({application=\"java-product-api\"}[$__interval]))",
+          "expr": "sum by (stream) (count_over_time({job=\"containerlogs\"}[$__interval]))",
           "queryType": "",
           "refId": "A"
         }
@@ -169,7 +169,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "sum by (level) (rate({application=\"java-product-api\"}[$__interval]))",
+          "expr": "sum by (stream) (rate({job=\"containerlogs\"}[$__interval]))",
           "queryType": "",
           "refId": "A"
         }
@@ -206,7 +206,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{application=\"java-product-api\"} |= \"\"",
+          "expr": "{job=\"containerlogs\"}",
           "queryType": "",
           "refId": "A"
         }
@@ -243,7 +243,7 @@
             "uid": "loki"
           },
           "editorMode": "code",
-          "expr": "{application=\"java-product-api\", level=\"ERROR\"} |= \"\"",
+          "expr": "{job=\"containerlogs\"} |= \"ERROR\"",
           "queryType": "",
           "refId": "A"
         }
