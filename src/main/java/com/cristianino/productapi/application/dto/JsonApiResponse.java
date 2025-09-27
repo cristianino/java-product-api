@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class JsonApiResponse<T> {
@@ -66,5 +67,31 @@ public class JsonApiResponse<T> {
     
     public void setErrors(List<JsonApiError> errors) {
         this.errors = errors;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JsonApiResponse<?> that = (JsonApiResponse<?>) o;
+        return Objects.equals(data, that.data) &&
+               Objects.equals(links, that.links) &&
+               Objects.equals(meta, that.meta) &&
+               Objects.equals(errors, that.errors);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(data, links, meta, errors);
+    }
+    
+    @Override
+    public String toString() {
+        return "JsonApiResponse{" +
+               "data=" + data +
+               ", links=" + links +
+               ", meta=" + meta +
+               ", errors=" + errors +
+               '}';
     }
 }

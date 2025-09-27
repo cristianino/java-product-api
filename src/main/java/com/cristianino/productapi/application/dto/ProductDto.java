@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class ProductDto {
     @JsonProperty("id")
@@ -78,5 +79,51 @@ public class ProductDto {
         public void setPrice(BigDecimal price) {
             this.price = price;
         }
+        
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ProductAttributes that = (ProductAttributes) o;
+            return Objects.equals(name, that.name) &&
+                   Objects.equals(price, that.price);
+        }
+        
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, price);
+        }
+        
+        @Override
+        public String toString() {
+            return "ProductAttributes{" +
+                   "name='" + name + '\'' +
+                   ", price=" + price +
+                   '}';
+        }
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProductDto that = (ProductDto) o;
+        return Objects.equals(id, that.id) &&
+               Objects.equals(type, that.type) &&
+               Objects.equals(attributes, that.attributes);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, type, attributes);
+    }
+    
+    @Override
+    public String toString() {
+        return "ProductDto{" +
+               "id='" + id + '\'' +
+               ", type='" + type + '\'' +
+               ", attributes=" + attributes +
+               '}';
     }
 }

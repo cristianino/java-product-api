@@ -74,16 +74,12 @@ class ProductTest {
 
     @Test
     void constructor_NegativePrice_ThrowsException() {
-        // Given
-        String name = "Test Product";
-        BigDecimal negativePrice = new BigDecimal("-10.00");
-
         // When & Then
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> new Product(name, negativePrice)
+            () -> new Product(null, "Test Product", BigDecimal.valueOf(-10.0))
         );
-        assertEquals("Product price must be non-negative", exception.getMessage());
+        assertEquals("Product price cannot be negative", exception.getMessage());
     }
 
     @Test
@@ -214,13 +210,13 @@ class ProductTest {
     @Test
     void setPrice_InvalidPrice_ThrowsException() {
         // Given
-        Product product = new Product("Valid Name", new BigDecimal("10.00"));
+        Product product = new Product(1L, "Test Product", BigDecimal.valueOf(10.0));
 
         // When & Then
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> product.setPrice(new BigDecimal("-1.00"))
+            () -> product.setPrice(BigDecimal.valueOf(-5.0))
         );
-        assertEquals("Product price must be non-negative", exception.getMessage());
+        assertEquals("Product price cannot be negative", exception.getMessage());
     }
 }

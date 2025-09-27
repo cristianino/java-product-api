@@ -3,6 +3,8 @@ package com.cristianino.productapi.application.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class JsonApiError {
     @JsonProperty("id")
@@ -107,5 +109,57 @@ public class JsonApiError {
         public void setParameter(String parameter) {
             this.parameter = parameter;
         }
+        
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            JsonApiErrorSource that = (JsonApiErrorSource) o;
+            return Objects.equals(pointer, that.pointer) &&
+                   Objects.equals(parameter, that.parameter);
+        }
+        
+        @Override
+        public int hashCode() {
+            return Objects.hash(pointer, parameter);
+        }
+        
+        @Override
+        public String toString() {
+            return "JsonApiErrorSource{" +
+                   "pointer='" + pointer + '\'' +
+                   ", parameter='" + parameter + '\'' +
+                   '}';
+        }
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JsonApiError that = (JsonApiError) o;
+        return Objects.equals(id, that.id) &&
+               Objects.equals(status, that.status) &&
+               Objects.equals(code, that.code) &&
+               Objects.equals(title, that.title) &&
+               Objects.equals(detail, that.detail) &&
+               Objects.equals(source, that.source);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, status, code, title, detail, source);
+    }
+    
+    @Override
+    public String toString() {
+        return "JsonApiError{" +
+               "id='" + id + '\'' +
+               ", status='" + status + '\'' +
+               ", code='" + code + '\'' +
+               ", title='" + title + '\'' +
+               ", detail='" + detail + '\'' +
+               ", source=" + source +
+               '}';
     }
 }

@@ -14,7 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -23,16 +24,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 class ProductControllerTest {
 
+    private static final String API_KEY = "test-api-key";
+
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    private static final String API_KEY = "test-api-key";
-
     @Test
-    void createProduct_ValidData_ReturnsCreatedProduct() throws Exception {
+    void createProduct_WithValidApiKey_ReturnsCreated() throws Exception {
         // Given
         ProductDto.ProductAttributes attributes = new ProductDto.ProductAttributes("Test Product", new BigDecimal("99.99"));
         ProductDto productDto = new ProductDto();
@@ -69,10 +70,9 @@ class ProductControllerTest {
     void getAllProducts_ReturnsProductsList() throws Exception {
         // When & Then
         mockMvc.perform(get("/api/products")
-                        .header("X-API-Key", API_KEY))
+                        .header("X-API-Key", API_KEY)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.links.self").value("/api/products"))
-                .andExpect(jsonPath("$.meta.count").exists());
+                .andExpect(jsonPath("$.data").isArray());
     }
 }

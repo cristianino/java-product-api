@@ -20,12 +20,18 @@ public class ProductUseCase {
     }
     
     public ProductDto createProduct(ProductDto productDto) {
+        if (productDto == null) {
+            throw new IllegalArgumentException("ProductDto cannot be null");
+        }
         Product product = mapToProduct(productDto);
         Product savedProduct = productDomainService.createProduct(product);
         return mapToDto(savedProduct);
     }
     
     public Optional<ProductDto> getProductById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Product ID cannot be null");
+        }
         return productDomainService.getProductById(id)
                 .map(this::mapToDto);
     }
@@ -38,16 +44,28 @@ public class ProductUseCase {
     }
     
     public Optional<ProductDto> updateProduct(Long id, ProductDto productDto) {
+        if (id == null) {
+            throw new IllegalArgumentException("Product ID cannot be null");
+        }
+        if (productDto == null) {
+            throw new IllegalArgumentException("ProductDto cannot be null");
+        }
         Product product = mapToProduct(productDto);
         Product updatedProduct = productDomainService.updateProduct(id, product);
         return updatedProduct != null ? Optional.of(mapToDto(updatedProduct)) : Optional.empty();
     }
     
     public boolean deleteProduct(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Product ID cannot be null");
+        }
         return productDomainService.deleteProduct(id);
     }
     
     private Product mapToProduct(ProductDto dto) {
+        if (dto.getAttributes() == null) {
+            throw new IllegalArgumentException("ProductDto attributes cannot be null");
+        }
         return new Product(
                 dto.getAttributes().getName(),
                 dto.getAttributes().getPrice()

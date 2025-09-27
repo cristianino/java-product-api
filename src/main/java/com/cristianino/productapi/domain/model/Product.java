@@ -12,13 +12,13 @@ public class Product {
 
     public Product(Long id, String name, BigDecimal price) {
         this.id = id;
-        this.name = name;
-        this.price = price;
+        this.name = validateName(name);
+        this.price = validatePrice(price);
     }
 
     public Product(String name, BigDecimal price) {
-        this.name = name;
-        this.price = price;
+        this.name = validateName(name);
+        this.price = validatePrice(price);
     }
 
     public Long getId() {
@@ -34,7 +34,7 @@ public class Product {
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.name = validateName(name);
     }
 
     public BigDecimal getPrice() {
@@ -42,7 +42,24 @@ public class Product {
     }
 
     public void setPrice(BigDecimal price) {
-        this.price = price;
+        this.price = validatePrice(price);
+    }
+
+    private String validateName(String name) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Product name cannot be null or empty");
+        }
+        return name;
+    }
+
+    private BigDecimal validatePrice(BigDecimal price) {
+        if (price == null) {
+            throw new IllegalArgumentException("Product price cannot be null");
+        }
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Product price cannot be negative");
+        }
+        return price;
     }
 
     @Override

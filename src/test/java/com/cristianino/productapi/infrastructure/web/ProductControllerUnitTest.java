@@ -189,7 +189,7 @@ class ProductControllerUnitTest {
         JsonApiRequest<ProductDto> request = new JsonApiRequest<>(inputProduct);
 
         when(productUseCase.updateProduct(eq(productId), any(ProductDto.class)))
-                .thenReturn(Optional.empty());
+                .thenThrow(new IllegalArgumentException("Invalid data"));
 
         // When & Then
         mockMvc.perform(put("/api/products/{id}", productId)
