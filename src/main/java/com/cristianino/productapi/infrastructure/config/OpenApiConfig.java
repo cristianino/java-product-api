@@ -19,9 +19,9 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
             .info(new Info()
-                .title("Product API - Multi-Version")
-                .version("2.0.0")
-                .description("A Spring Boot 3 microservice for managing products with versioned APIs and JSON:API specification")
+                .title("Product API with Versioning Strategy")
+                .version("1.0.0")
+                .description("A Spring Boot 3 microservice for managing products with JSON:API specification and versioning strategy ready for V2.0 implementation")
                 .contact(new Contact()
                     .name("API Support")
                     .email("support@cristianino.com")))
@@ -41,25 +41,16 @@ public class OpenApiConfig {
     public GroupedOpenApi publicApiV1() {
         return GroupedOpenApi.builder()
                 .group("v1-products")
-                .displayName("Products API V1.0")
+                .displayName("Products API V1.0 (Current)")
                 .pathsToMatch("/api/v1/**")
                 .build();
     }
     
     @Bean
-    public GroupedOpenApi publicApiV2() {
+    public GroupedOpenApi defaultApi() {
         return GroupedOpenApi.builder()
-                .group("v2-products")
-                .displayName("Products API V2.0 (Current)")
-                .pathsToMatch("/api/v2/**")
-                .build();
-    }
-    
-    @Bean
-    public GroupedOpenApi legacyApi() {
-        return GroupedOpenApi.builder()
-                .group("legacy")
-                .displayName("Legacy API (Deprecated)")
+                .group("default-products")
+                .displayName("Products API (Default)")
                 .pathsToMatch("/api/products/**")
                 .build();
     }

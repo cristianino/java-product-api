@@ -1,6 +1,6 @@
 # API Versioning Strategy Guide
 
-This document describes the comprehensive API versioning strategy implemented in the Java Product API microservice.
+This document describes the API versioning strategy for the Java Product API microservice and provides a complete roadmap for implementing V2.0.
 
 ## 🎯 Versioning Approach
 
@@ -13,44 +13,13 @@ We use **URI Path Versioning** as our primary strategy:
 
 ### Version Format
 - **Pattern:** `/api/v{major}/resource`
-- **Examples:** `/api/v1/products`, `/api/v2/products`
+- **Examples:** `/api/v1/products`, `/api/v2/products` (future)
 - **Semantic:** Major version only in URI (e.g., v1, v2, v3)
 
-## 📋 Current API Versions
+## 📋 Current Implementation
 
-### Version 2.0 (Current)
+### Version 1.0 (Current & Stable)
 **Status:** ✅ **Active & Recommended**  
-**Base Path:** `/api/v2/`
-
-**Features:**
-- Enhanced pagination (`page`, `size` parameters)
-- Rich metadata in responses (timestamps, version info)
-- Improved error handling with specific error codes
-- Additional HATEOAS links (edit, delete, collection)
-- Version-specific health endpoints
-- Filtering capabilities
-
-**Response Enhancements:**
-```json
-{
-  "data": {...},
-  "links": {
-    "self": "/api/v2/products/1",
-    "edit": "/api/v2/products/1",
-    "delete": "/api/v2/products/1",
-    "collection": "/api/v2/products"
-  },
-  "meta": {
-    "version": "2.0",
-    "api_version": "v2",
-    "created_at": "2025-09-27T17:30:22.123Z",
-    "features": ["pagination", "filtering", "enhanced_metadata"]
-  }
-}
-```
-
-### Version 1.0 (Stable)
-**Status:** ✅ **Active & Supported**  
 **Base Path:** `/api/v1/`
 
 **Features:**
@@ -58,6 +27,7 @@ We use **URI Path Versioning** as our primary strategy:
 - JSON:API specification compliance
 - Basic metadata and links
 - Stable and proven functionality
+- Ready foundation for V2.0 development
 
 **Response Format:**
 ```json
@@ -68,38 +38,208 @@ We use **URI Path Versioning** as our primary strategy:
 }
 ```
 
-### Legacy Version (Deprecated)
-**Status:** ⚠️ **Deprecated**  
+### Default Version
+**Status:** ✅ **Active**  
 **Base Path:** `/api/products`
 
 **Purpose:**
-- Backward compatibility during migration
-- Existing integrations support
-- Gradual deprecation path
+- Default endpoints for backward compatibility
+- Simple integration for basic use cases
+- Same functionality as V1.0 without version prefix
 
-## 🛠️ Implementation Details
+## 🚀 V2.0 Development Roadmap
 
-### Controller Architecture
+### Version 2.0 (Planned Implementation)
+**Status:** 📋 **Planned - Ready for Development**  
+**Base Path:** `/api/v2/` (future)
+
+### Proposed V2.0 Features
+
+#### 1. Enhanced Pagination & Filtering
+```bash
+GET /api/v2/products?page=0&size=20&name=laptop&minPrice=100&maxPrice=500
+```
+
+**Response with Enhanced Metadata:**
+```json
+{
+  "data": [...],
+  "links": {
+    "self": "/api/v2/products?page=0&size=20",
+    "first": "/api/v2/products?page=0&size=20",
+    "last": "/api/v2/products?page=5&size=20",
+    "next": "/api/v2/products?page=1&size=20",
+    "prev": null
+  },
+  "meta": {
+    "version": "2.0",
+    "api_version": "v2",
+    "page": 0,
+    "size": 20,
+    "total_items": 120,
+    "total_pages": 6,
+    "retrieved_at": "2025-09-27T17:30:22.123Z",
+    "features": ["pagination", "filtering", "enhanced_metadata", "bulk_operations"]
+  }
+}
+```
+
+#### 2. Rich HATEOAS Links
+```json
+{
+  "links": {
+    "self": "/api/v2/products/1",
+    "edit": "/api/v2/products/1",
+    "delete": "/api/v2/products/1",
+    "collection": "/api/v2/products",
+    "related": "/api/v2/products/1/inventory"
+  }
+}
+```
+
+#### 3. Enhanced Error Handling
+```json
+{
+  "errors": [
+    {
+      "id": "unique-error-id",
+      "status": "400",
+      "code": "VALIDATION_ERROR",
+      "title": "Validation Failed",
+      "detail": "Product price must be greater than 0",
+      "source": {
+        "pointer": "/data/attributes/price"
+      },
+      "meta": {
+        "timestamp": "2025-09-27T17:30:22.123Z",
+        "request_id": "req-123"
+      }
+    }
+  ]
+}
+```
+
+#### 4. Version-Specific Health Endpoint
+```bash
+GET /api/v2/products/health
+```
+
+```json
+{
+  "status": "UP",
+  "version": "2.0",
+  "api_version": "v2",
+  "timestamp": "2025-09-27T17:30:22.123Z",
+  "features": [
+    "pagination",
+    "filtering", 
+    "enhanced_metadata",
+    "bulk_operations",
+    "inventory_integration"
+  ],
+  "performance": {
+    "avg_response_time": "45ms",
+    "cache_hit_rate": "85%"
+  }
+}
+```
+
+#### 5. Bulk Operations
+```bash
+# Bulk create
+POST /api/v2/products/batch
+
+# Bulk update
+PATCH /api/v2/products/batch
+
+# Bulk delete
+DELETE /api/v2/products/batch
+```
+
+## 🛠️ V2.0 Implementation Guide
+
+### Step 1: Controller Architecture Setup
+
+Create the V2.0 controller structure:
 ```
 src/main/java/.../infrastructure/web/
-├── ProductController.java           # Legacy (deprecated)
-├── v1/ProductControllerV1.java     # Version 1.0
-├── v2/ProductControllerV2.java     # Version 2.0
+├── ProductController.java           # Default endpoints
+├── v1/ProductControllerV1.java     # Version 1.0 (current)
+├── v2/ProductControllerV2.java     # Version 2.0 (implement this)
 └── ConnectivityController.java     # Unversioned utilities
 ```
 
-### OpenAPI Documentation
-Separate documentation groups for each version:
-- **V2.0:** "Products API V2.0 (Current)"
-- **V1.0:** "Products API V1.0"
-- **Legacy:** "Legacy API (Deprecated)"
-- **Utils:** "Connectivity & Health"
+### Step 2: V2.0 Controller Template
 
-### Testing Strategy
-Each version has dedicated test suites:
-- `ProductControllerV1Test.java`
-- `ProductControllerV2Test.java`
-- `ApiVersioningIntegrationTest.java`
+```java
+@RestController
+@RequestMapping("/api/v2/products")
+@Tag(name = "Products V2", description = "Product management operations - Version 2.0 (Enhanced)")
+@SecurityRequirement(name = "X-API-Key")
+public class ProductControllerV2 {
+    
+    private final ProductUseCase productUseCase;
+    
+    public ProductControllerV2(ProductUseCase productUseCase) {
+        this.productUseCase = productUseCase;
+    }
+    
+    @GetMapping
+    @Operation(summary = "Get products with pagination (V2)")
+    public ResponseEntity<JsonApiResponse<List<ProductDto>>> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String name) {
+        
+        // Implementation with pagination logic
+        // Enhanced metadata
+        // Rich HATEOAS links
+    }
+    
+    @GetMapping("/health")
+    @Operation(summary = "V2 API Health Check")
+    public ResponseEntity<Map<String, Object>> healthCheck() {
+        // V2-specific health information
+    }
+    
+    // Additional V2 endpoints...
+}
+```
+
+### Step 3: Enhanced DTOs for V2
+
+Consider creating V2-specific DTOs if needed:
+```java
+// Enhanced product response for V2
+public class ProductV2Response extends ProductDto {
+    private LocalDateTime lastUpdated;
+    private String category;
+    private List<String> tags;
+    // Additional V2 fields
+}
+```
+
+### Step 4: OpenAPI Configuration Update
+
+Update `OpenApiConfig.java` to include V2 group:
+```java
+@Bean
+public GroupedOpenApi publicApiV2() {
+    return GroupedOpenApi.builder()
+            .group("v2-products")
+            .displayName("Products API V2.0 (Enhanced)")
+            .pathsToMatch("/api/v2/**")
+            .build();
+}
+```
+
+### Step 5: Testing Strategy
+
+Create comprehensive test suites:
+- `ProductControllerV2Test.java` - Unit tests for V2
+- Update `ApiVersioningIntegrationTest.java` - Integration tests
+- Performance tests for pagination
+- Backward compatibility tests
 
 ## 📊 Version Comparison
 

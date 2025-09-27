@@ -24,13 +24,13 @@ class ApiVersioningIntegrationTest {
     private final String API_KEY = "your-secret-api-key-here";
 
     @Test
-    void shouldSupportMultipleApiVersionsSimultaneously() throws Exception {
+    void shouldSupportCurrentApiVersions() throws Exception {
         String productRequest = """
             {
                 "data": {
                     "type": "products",
                     "attributes": {
-                        "name": "Multi-Version Product",
+                        "name": "Test Product",
                         "price": 199.99
                     }
                 }
@@ -42,58 +42,28 @@ class ApiVersioningIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productRequest))
                 .andExpect(status().isCreated())
-                .andExpected(jsonPath("$.meta.version").value("1.0"));
+                .andExpect(jsonPath("$.meta.version").value("1.0"));
 
-        // Create product using V2 API
-        mockMvc.perform(post("/api/v2/products")
+        // Create product using default API
+        mockMvc.perform(post("/api/products")
                 .header("X-API-Key", API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productRequest))
-                .andExpected(status().isCreated())
-                .andExpected(jsonPath("$.meta.version").value("2.0"))
-                .andExpected(jsonPath("$.meta.api_version").value("v2"))
-                .andExpected(jsonPath("$.links.edit").exists());
+                .andExpect(status().isCreated());
 
-        // Retrieve products using V1 API (should have version 1.0 metadata)
+        // Retrieve products using V1 API
         mockMvc.perform(get("/api/v1/products")
                 .header("X-API-Key", API_KEY))
-                .andExpected(status().isOk())
-                .andExpected(jsonPath("$.meta.version").value("1.0"));
-
-        // Retrieve products using V2 API (should have enhanced metadata)
-        mockMvc.perform(get("/api/v2/products")
-                .header("X-API-Key", API_KEY))
-                .andExpected(status().isOk())
-                .andExpected(jsonPath("$.meta.version").value("2.0"))
-                .andExpect(jsonPath("$.meta.features").isArray())
-                .andExpect(jsonPath("$.meta.page").exists());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.meta.version").value("1.0"));
     }
 
     @Test
-    void shouldAccessLegacyApiWithDeprecationWarning() throws Exception {
-        // Legacy API should still work but marked as deprecated
+    void shouldAccessDefaultApi() throws Exception {
+        // Default API should work normally
         mockMvc.perform(get("/api/products")
                 .header("X-API-Key", API_KEY))
-                .andExpected(status().isOk());
-    }
-
-    @Test
-    void shouldProvideV2SpecificFeatures() throws Exception {
-        // V2 Health check endpoint
-        mockMvc.perform(get("/api/v2/products/health")
-                .header("X-API-Key", API_KEY))
-                .andExpected(status().isOk())
-                .andExpect(jsonPath("$.status").value("UP"))
-                .andExpected(jsonPath("$.features").isArray());
-
-        // V2 Pagination parameters
-        mockMvc.perform(get("/api/v2/products")
-                .param("page", "0")
-                .param("size", "10")
-                .header("X-API-Key", API_KEY))
-                .andExpected(status().isOk())
-                .andExpected(jsonPath("$.meta.page").value(0))
-                .andExpected(jsonPath("$.meta.size").value(10));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -114,15 +84,26 @@ class ApiVersioningIntegrationTest {
                 .header("X-API-Key", API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productRequest))
-                .andExpected(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.links.self").value(org.hamcrest.Matchers.containsString("/api/v1/")));
 
-        // Create via V2 and check V2 links
-        mockMvc.perform(post("/api/v2/products")
+        // Create via default API
+        mockMvc.perform(post("/api/products")
                 .header("X-API-Key", API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(productRequest))
-                .andExpected(status().isCreated())
-                .andExpect(jsonPath("$.links.self").value(org.hamcrest.Matchers.containsString("/api/v2/")))
-                .andExpected(jsonPath("$.links.collection").value("/api/v2/products"));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.links.self").value(org.hamcrest.Matchers.containsString("/api/products/")));
+    }
+
+    @Test
+    void shouldBeReadyForV2Implementation() throws Exception {
+        // Verify that V1 structure is solid for V2 extension
+        mockMvc.perform(get("/api/v1/products")
+                .header("X-API-Key", API_KEY))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.meta.version").value("1.0"))
+                .andExpect(jsonPath("$.links").exists())
+                .andExpect(jsonPath("$.data").exists());
     }
 }

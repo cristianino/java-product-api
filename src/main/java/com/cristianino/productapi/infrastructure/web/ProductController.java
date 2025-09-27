@@ -19,9 +19,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/products")
-@Tag(name = "Products (Legacy)", description = "Product management operations - Legacy endpoints (redirects to latest version)")
+@Tag(name = "Products", description = "Product management operations - Default endpoints")
 @SecurityRequirement(name = "X-API-Key")
-@Deprecated
 public class ProductController {
     
     private final ProductUseCase productUseCase;
@@ -31,9 +30,7 @@ public class ProductController {
     }
     
     @PostMapping
-    @Operation(summary = "Create a new product", 
-               description = "⚠️ DEPRECATED: Use /api/v2/products instead. This endpoint will redirect to the latest version.")
-    @Deprecated
+    @Operation(summary = "Create a new product")
     public ResponseEntity<JsonApiResponse<ProductDto>> createProduct(
             @Valid @RequestBody JsonApiRequest<ProductDto> request) {
         try {
