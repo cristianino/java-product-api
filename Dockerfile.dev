@@ -1,0 +1,52 @@
+# Development Dockerfile for Java Product API
+FROM eclipse-temurin:17-jdk AS development
+
+# Install Maven and development tools
+RUN apt-get update && apt-get install -y \
+    maven \
+    curl \
+    wget \
+    vim \
+    nano \
+    git \
+    net-tools \
+    htop \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Set development environment variables
+ENV SPRING_PROFILES_ACTIVE=dev
+ENV JAVA_OPTS="-Xms512m -Xmx1024m"
+
+# Copy pom.xml first for better Docker layer caching
+COPY pom.xml .
+
+# Download dependencies in a separate layer for better caching
+RUN mvn dependency:go-offline -B
+
+# Create non-root user for development
+RUN addgroup --system devgroup && adduser --system --group devuser --shell /bin/bash --home /home/devuser
+RUN mkdir -p /home/devuser/.m2
+RUN chown -R devuser:devgroup /app /home/devuser
+
+# Switch to development user
+USER devuser
+
+# Copy source code
+COPY src ./src
+
+# Expose application port (8080) and debug port (5005)
+EXPOSE 8080 5005
+
+# Create health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/actuator/health || exit 1
+
+# Create a startup script for development
+RUN echo '#!/bin/bash\nif [ "$ENABLE_DEBUG" = "true" ]; then\n    mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005"\nelse\n    mvn spring-boot:run\nfi' > /app/start-dev.sh && chmod +x /app/start-dev.sh
+
+# Default command for development (with hot reload using Spring Boot DevTools)
+CMD ["/app/start-dev.sh"]

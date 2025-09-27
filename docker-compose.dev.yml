@@ -1,0 +1,81 @@
+services:
+  # Base de datos PostgreSQL para desarrollo
+  postgres-dev:
+    image: postgres:15-alpine
+    container_name: java-product-api-postgres-dev
+    environment:
+      POSTGRES_DB: productapi
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: devpass123
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d productapi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dev-network
+
+  # Aplicación Spring Boot
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: java-product-api-app-dev
+    environment:
+      # Configuración de base de datos
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-dev:5432/productapi
+      SPRING_DATASOURCE_USERNAME: dev
+      SPRING_DATASOURCE_PASSWORD: devpass123
+      SPRING_PROFILES_ACTIVE: dev
+      # Configuración JPA/Hibernate
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      SPRING_JPA_SHOW_SQL: true
+      # Configuración Flyway
+      SPRING_FLYWAY_ENABLED: true
+      # Variables para debugging (opcional)
+      JAVA_OPTS: "-Xms512m -Xmx1024m"
+    ports:
+      - "8080:8080"  # Puerto de la aplicación
+      - "5005:5005"  # Puerto para debugging remoto (opcional)
+    volumes:
+      # Para desarrollo con hot reload
+      - ./src:/app/src
+      - ./pom.xml:/app/pom.xml
+      # Cache de Maven para mejorar performance
+      - maven_cache:/home/devuser/.m2
+    depends_on:
+      postgres-dev:
+        condition: service_healthy
+    networks:
+      - dev-network
+    restart: unless-stopped
+
+  # Adminer para gestión de base de datos (opcional)
+  adminer:
+    image: adminer:4.8.1
+    container_name: java-product-api-adminer-dev
+    ports:
+      - "8081:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres-dev
+    depends_on:
+      - postgres-dev
+    networks:
+      - dev-network
+
+# Volúmenes para persistencia
+volumes:
+  postgres_dev_data:
+    driver: local
+  maven_cache:
+    driver: local
+
+# Red para comunicación entre contenedores
+networks:
+  dev-network:
+    driver: bridge
