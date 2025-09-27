@@ -37,6 +37,8 @@ services:
       SPRING_JPA_SHOW_SQL: true
       # Configuración Flyway
       SPRING_FLYWAY_ENABLED: true
+      # Configuración Loki para desarrollo
+      LOKI_HOST: loki-dev
       # Variables para debugging (opcional)
       JAVA_OPTS: "-Xms512m -Xmx1024m"
     ports:
@@ -54,6 +56,11 @@ services:
     networks:
       - dev-network
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "10"
 
   # Adminer para gestión de base de datos (opcional)
   adminer:
@@ -68,11 +75,66 @@ services:
     networks:
       - dev-network
 
+  # Loki para agregación de logs
+  loki-dev:
+    image: grafana/loki:2.9.0
+    container_name: java-product-api-loki-dev
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./config/loki:/etc/loki
+      - loki_dev_data:/loki
+    networks:
+      - dev-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Promtail para recolección de logs
+  promtail-dev:
+    image: grafana/promtail:2.9.0
+    container_name: java-product-api-promtail-dev
+    volumes:
+      - ./config/promtail:/etc/promtail
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config-dev.yml
+    networks:
+      - dev-network
+    depends_on:
+      - loki-dev
+
+  # Grafana para visualización
+  grafana-dev:
+    image: grafana/grafana:10.1.0
+    container_name: java-product-api-grafana-dev
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_USERS_ALLOW_SIGN_UP: false
+    volumes:
+      - grafana_dev_data:/var/lib/grafana
+      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./config/grafana/provisioning/datasources/datasources-dev.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - dev-network
+    depends_on:
+      - loki-dev
+
 # Volúmenes para persistencia
 volumes:
   postgres_dev_data:
     driver: local
   maven_cache:
+    driver: local
+  loki_dev_data:
+    driver: local
+  grafana_dev_data:
     driver: local
 
 # Red para comunicación entre contenedores
