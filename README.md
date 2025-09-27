@@ -1,4 +1,6 @@
-# Java Product API
+# Java Pro- **📖 [API Documentation](http://localhost:8080/swagger-ui/index.html)** - Interactive Swagger UI (when running)
+- **🏥 [Health Check](http://localhost:8080/actuator/health)** - Application health status
+- **🔗 [Connectivity Status](http://localhost:8080/api/connectivity/status)** - Microservice connectivity monitoringct API
 
 A Spring Boot 3 microservice for managing products with **simple and clear APIs** designed for microservice communication. Features JSON:API specification, Hexagonal Architecture, PostgreSQL, and Docker support.
 
@@ -23,7 +25,8 @@ A Spring Boot 3 microservice for managing products with **simple and clear APIs*
 - **🔄 Flyway** database migrations  
 - **📚 Swagger/OpenAPI** documentation with microservice examples
 - **💊 Health checks** with microservice connectivity monitoring
-- **📝 Structured JSON logging** for Loki/Grafana
+- **� Connectivity endpoints** for verifying communication with other microservices
+- **�📝 Structured JSON logging** for Loki/Grafana
 - **🧪 Unit & Integration tests** with JUnit and Testcontainers
 - **🐳 Docker** support with multi-environment configurations
 
@@ -76,6 +79,103 @@ curl -H "X-API-Key: your-secret-api-key-here" \
 ```
 
 **See [MICROSERVICE_INTEGRATION.md](MICROSERVICE_INTEGRATION.md) for complete integration guide.**
+
+## 🔗 Microservice Connectivity
+
+The API includes **connectivity endpoints** to verify communication with other microservices, perfect for health checks and integration testing.
+
+### Connectivity Endpoints
+
+#### Check Inventory Service Connection
+```bash
+# Check connectivity to inventory microservice
+curl -H "X-API-Key: your-secret-api-key-here" \
+     -H "Accept: application/json" \
+     "http://localhost:8080/api/connectivity/inventory"
+```
+
+**Response when inventory is available:**
+```json
+{
+  "service": "inventory-api",
+  "status": "UP",
+  "url": "http://localhost:8082/actuator/health",
+  "response": {"status": "UP", "components": {...}},
+  "message": "Successfully connected to Inventory service"
+}
+```
+
+**Response when inventory is unavailable:**
+```json
+{
+  "service": "inventory-api", 
+  "status": "DOWN",
+  "url": "http://localhost:8082/actuator/health",
+  "error": "Connection refused",
+  "message": "Failed to connect to Inventory service"
+}
+```
+
+#### Check Overall Connectivity Status
+```bash
+# Check status of all connected microservices
+curl -H "X-API-Key: your-secret-api-key-here" \
+     -H "Accept: application/json" \
+     "http://localhost:8080/api/connectivity/status"
+```
+
+**Response:**
+```json
+{
+  "overall-status": "UP",  // UP | DEGRADED
+  "product-api": {
+    "service": "product-api",
+    "status": "UP",
+    "message": "Product API is running"
+  },
+  "inventory-api": {
+    "service": "inventory-api",
+    "status": "UP",
+    "url": "http://localhost:8082/actuator/health",
+    "response": {...},
+    "message": "Successfully connected to Inventory service"
+  },
+  "timestamp": 1758994357041
+}
+```
+
+### Configuration for Microservice Communication
+
+The connectivity is configured in `application.yml`:
+
+```yaml
+microservices:
+  inventory:
+    base-url: "http://localhost:8082"
+    health-endpoint: "/actuator/health"
+```
+
+### Testing Connectivity in Practice
+
+1. **Start Product API:**
+   ```bash
+   docker compose -f docker-compose.dev.yml up -d
+   ```
+
+2. **Start Inventory API on port 8082**
+
+3. **Verify connectivity:**
+   ```bash
+   # Should return status: "UP" when both services are running
+   curl -H "X-API-Key: your-secret-api-key-here" \
+        "http://localhost:8080/api/connectivity/status" | jq .
+   ```
+
+This connectivity feature is essential for:
+- **🏥 Health monitoring** in microservice architectures
+- **🔍 Integration testing** and CI/CD pipelines  
+- **📊 Service mesh observability**
+- **⚡ Quick troubleshooting** of service dependencies
 
 ### Local Development
 
@@ -289,10 +389,12 @@ docker run -p 8080:8080 \
 
 | Command | Description |
 |---------|-------------|
-| `docker-compose up` | Start full application stack |
+| `docker compose -f docker-compose.dev.yml up -d` | Start full application stack |
 | `mvn clean test jacoco:report` | Run all tests with coverage |
 | `mvn spring-boot:run` | Start application locally |
 | `curl -H "X-API-Key: your-secret-api-key-here" http://localhost:8080/api/products` | Test API |
+| `curl -H "X-API-Key: your-secret-api-key-here" http://localhost:8080/api/connectivity/status` | Check microservice connectivity |
+| `curl -H "X-API-Key: your-secret-api-key-here" http://localhost:8080/api/connectivity/inventory` | Check inventory service connection |
 
 **📖 Need more details?** Check out the comprehensive [Developer Guide](DEVELOPER_GUIDE.md) for:
 - 🏗️ Architecture deep-dive
