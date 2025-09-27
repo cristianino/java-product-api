@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: productdb
+      POSTGRES_USER: productuser
+      POSTGRES_PASSWORD: productpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U productuser -d productdb"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  java-product-api:
+    build: .
+    container_name: java-product-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/productdb
+      SPRING_DATASOURCE_USERNAME: productuser
+      SPRING_DATASOURCE_PASSWORD: productpass
+      SPRING_PROFILES_ACTIVE: prod
+      APP_API_KEY: your-secret-api-key-here
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  backend-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
