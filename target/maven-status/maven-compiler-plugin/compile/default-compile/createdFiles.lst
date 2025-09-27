@@ -1,6 +1,0 @@
-com/cristianino/productapi/domain/ports/LoadProductPort.class
-com/cristianino/productapi/domain/ports/package-info.class
-com/cristianino/productapi/application/services/ProductService.class
-com/cristianino/productapi/domain/ports/CreateProductUseCase.class
-com/cristianino/productapi/domain/model/Product.class
-com/cristianino/productapi/domain/ports/SaveProductPort.class

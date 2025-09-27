@@ -1,0 +1,22 @@
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Spring Boot
+.DS_Store
+*.log
+
+# OS generated files
+Thumbs.db
+
+# Java compiled classes
+*.class

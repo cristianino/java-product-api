@@ -1,6 +1,0 @@
-/home/runner/work/java-product-api/java-product-api/src/main/java/com/cristianino/productapi/domain/model/Product.java
-/home/runner/work/java-product-api/java-product-api/src/main/java/com/cristianino/productapi/domain/ports/LoadProductPort.java
-/home/runner/work/java-product-api/java-product-api/src/main/java/com/cristianino/productapi/domain/ports/SaveProductPort.java
-/home/runner/work/java-product-api/java-product-api/src/main/java/com/cristianino/productapi/application/services/ProductService.java
-/home/runner/work/java-product-api/java-product-api/src/main/java/com/cristianino/productapi/domain/ports/package-info.java
-/home/runner/work/java-product-api/java-product-api/src/main/java/com/cristianino/productapi/domain/ports/CreateProductUseCase.java
