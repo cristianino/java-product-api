@@ -37,7 +37,7 @@ class ProductControllerV1Test {
     @Test
     void shouldCreateProductV1() throws Exception {
         // Given
-        ProductDto productDto = new ProductDto(1L, "Test Product", new BigDecimal("99.99"));
+        ProductDto productDto = new ProductDto("1", "Test Product", new BigDecimal("99.99"));
         when(productUseCase.createProduct(any(ProductDto.class))).thenReturn(productDto);
 
         String requestBody = """
@@ -59,13 +59,13 @@ class ProductControllerV1Test {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.attributes.name").value("Test Product"))
                 .andExpect(jsonPath("$.data.attributes.price").value(99.99))
-                .andExpected(jsonPath("$.meta.version").value("1.0"));
+                .andExpect(jsonPath("$.meta.version").value("1.0"));
     }
 
     @Test
     void shouldGetProductByIdV1() throws Exception {
         // Given
-        ProductDto productDto = new ProductDto(1L, "Test Product", new BigDecimal("99.99"));
+        ProductDto productDto = new ProductDto("1", "Test Product", new BigDecimal("99.99"));
         when(productUseCase.getProductById(1L)).thenReturn(Optional.of(productDto));
 
         // When & Then
@@ -81,8 +81,8 @@ class ProductControllerV1Test {
     void shouldGetAllProductsV1() throws Exception {
         // Given
         List<ProductDto> products = List.of(
-            new ProductDto(1L, "Product 1", new BigDecimal("99.99")),
-            new ProductDto(2L, "Product 2", new BigDecimal("199.99"))
+            new ProductDto("1", "Product 1", new BigDecimal("99.99")),
+            new ProductDto("2", "Product 2", new BigDecimal("199.99"))
         );
         when(productUseCase.getAllProducts()).thenReturn(products);
 
@@ -100,7 +100,7 @@ class ProductControllerV1Test {
     @Test
     void shouldUpdateProductV1() throws Exception {
         // Given
-        ProductDto updatedProduct = new ProductDto(1L, "Updated Product", new BigDecimal("149.99"));
+        ProductDto updatedProduct = new ProductDto("1", "Updated Product", new BigDecimal("149.99"));
         when(productUseCase.updateProduct(eq(1L), any(ProductDto.class))).thenReturn(Optional.of(updatedProduct));
 
         String requestBody = """

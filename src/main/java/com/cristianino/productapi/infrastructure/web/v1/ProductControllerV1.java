@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/products")
-@Tag(name = "Products V1", description = "Product management operations - Version 1.0")
+@Tag(name = "Products V1", description = "📦 Product Management API V1.0 - Stable & Production Ready")
 @SecurityRequirement(name = "X-API-Key")
 public class ProductControllerV1 {
     
@@ -31,7 +31,20 @@ public class ProductControllerV1 {
     }
     
     @PostMapping
-    @Operation(summary = "Create a new product", description = "Creates a new product using JSON:API format - Version 1.0")
+    @Operation(summary = "Create a new product", 
+               description = "Creates a new product using **JSON:API format** (V1.0).\n\n" +
+                           "**Request Format:**\n" +
+                           "```json\n" +
+                           "{\n" +
+                           "  \"data\": {\n" +
+                           "    \"type\": \"products\",\n" +
+                           "    \"attributes\": {\n" +
+                           "      \"name\": \"Product Name\",\n" +
+                           "      \"price\": 99.99\n" +
+                           "    }\n" +
+                           "  }\n" +
+                           "}\n" +
+                           "```")
     public ResponseEntity<JsonApiResponse<ProductDto>> createProduct(
             @Valid @RequestBody JsonApiRequest<ProductDto> request) {
         try {
@@ -63,7 +76,13 @@ public class ProductControllerV1 {
     }
     
     @GetMapping
-    @Operation(summary = "Get all products", description = "Retrieves all products with pagination support - Version 1.0")
+    @Operation(summary = "Get all products", 
+               description = "Retrieves all products in **JSON:API format** (V1.0).\n\n" +
+                           "**Features:**\n" +
+                           "- Complete product list\n" +
+                           "- HATEOAS links\n" +
+                           "- Metadata with count\n\n" +
+                           "**Future V2.0 will add:** Pagination, filtering, sorting")
     public ResponseEntity<JsonApiResponse<List<ProductDto>>> getAllProducts() {
         List<ProductDto> products = productUseCase.getAllProducts();
         Map<String, String> links = Map.of("self", "/api/v1/products");

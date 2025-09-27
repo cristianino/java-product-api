@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/products")
-@Tag(name = "Products", description = "Product management operations - Default endpoints")
+@Tag(name = "Products Default", description = "📦 Product Management API - Default/Legacy Endpoints (Same as V1.0)")
 @SecurityRequirement(name = "X-API-Key")
 public class ProductController {
     
@@ -30,7 +30,10 @@ public class ProductController {
     }
     
     @PostMapping
-    @Operation(summary = "Create a new product")
+    @Operation(summary = "Create a new product (Default API)", 
+               description = "Creates a new product using default endpoints.\n\n" +
+                           "**Note:** For new integrations, consider using `/api/v1/products` instead.\n\n" +
+                           "Same functionality as V1.0 API without version prefix.")
     public ResponseEntity<JsonApiResponse<ProductDto>> createProduct(
             @Valid @RequestBody JsonApiRequest<ProductDto> request) {
         try {
