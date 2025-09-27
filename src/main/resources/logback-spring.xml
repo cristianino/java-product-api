@@ -24,6 +24,31 @@
         </encoder>
     </appender>
 
+    <!-- Loki appender for centralized logging -->
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <http>
+            <url>http://${LOKI_HOST:-loki}:3100/loki/api/v1/push</url>
+        </http>
+        <format>
+            <label>
+                <pattern>application=java-product-api,host=${HOSTNAME:-localhost},level=%level</pattern>
+            </label>
+            <message>
+                <pattern>
+                    {
+                        "timestamp": "%d{yyyy-MM-dd HH:mm:ss.SSS}",
+                        "level": "%level",
+                        "thread": "%thread",
+                        "logger": "%logger{36}",
+                        "message": "%message",
+                        "mdc": "%X",
+                        "exception": "%ex"
+                    }
+                </pattern>
+            </message>
+        </format>
+    </appender>
+
     <!-- Profile-specific configuration -->
     <springProfile name="!prod">
         <root level="INFO">
@@ -34,6 +59,7 @@
     <springProfile name="prod">
         <root level="INFO">
             <appender-ref ref="JSON"/>
+            <appender-ref ref="LOKI"/>
         </root>
     </springProfile>
 </configuration>

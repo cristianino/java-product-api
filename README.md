@@ -7,7 +7,8 @@ A Spring Boot 3 microservice for managing products with **simple and clear APIs*
 - **🚀 [Developer Guide](DEVELOPER_GUIDE.md)** - Complete setup, testing, and development guide
 - **🔗 [Microservice Integration](MICROSERVICE_INTEGRATION.md)** - **Simple guide for consuming APIs**
 - **💡 [Integration Examples](INTEGRATION_EXAMPLES.md)** - **Practical examples for inventory microservice**
-- **📖 [API Documentation](http://localhost:8080/swagger-ui/index.html)** - Interactive Swagger UI (when running)
+- **� [Observability Guide](OBSERVABILITY_GUIDE.md)** - **Loki + Grafana dashboard usage and monitoring**
+- **�📖 [API Documentation](http://localhost:8080/swagger-ui/index.html)** - Interactive Swagger UI (when running)
 - **🏥 [Health Check](http://localhost:8080/actuator/health)** - Application health status
 
 ## Features
@@ -214,10 +215,50 @@ The application follows these principles:
 - **JSON:API specification** for consistent API responses
 - **Comprehensive testing** with unit and integration tests
 
-## Monitoring & Observability
+## 📊 Monitoring & Observability
 
 ### Health Checks
 - Endpoint: `/actuator/health`
+
+### 📈 Loki + Grafana Stack
+
+El proyecto incluye un stack completo de observabilidad con Loki y Grafana para visualización de logs centralizada.
+
+#### Configuración incluida:
+- **Loki**: Agregación de logs centralizada
+- **Promtail**: Recolección de logs de contenedores Docker 
+- **Grafana**: Dashboards interactivos para visualización de logs
+
+#### Acceso rápido:
+```bash
+# Iniciar el stack completo incluyendo observabilidad
+docker compose up -d
+
+# Acceder a Grafana
+http://localhost:3000
+# Usuario: admin, Contraseña: admin123
+```
+
+#### URLs de los servicios:
+- **🎯 Grafana Dashboard**: http://localhost:3000
+- **📊 Loki API**: http://localhost:3100
+- **🔍 Loki Health**: http://localhost:3100/ready
+
+#### Dashboards incluidos:
+- **Java Product API - Logs Dashboard**: Visualización completa de logs de la aplicación
+  - Distribución de niveles de log (INFO, ERROR, WARN, DEBUG)
+  - Rate de logs por nivel en tiempo real
+  - Logs de aplicación con búsqueda y filtrado
+  - Panel específico para logs de ERROR
+
+#### Características de logging:
+- **Logs estructurados en JSON** enviados directamente a Loki
+- **Etiquetas automáticas**: `application=java-product-api`, `host`, `level`
+- **Metadatos incluidos**: timestamp, thread, logger, MDC context, excepciones
+- **Configuración dual**: logs en consola para desarrollo + Loki para producción
+
+#### 📖 Detailed Documentation:
+Para una guía completa sobre cómo usar los dashboards, interpretar las métricas y personalizar las queries, consulta la **[Observability Guide](OBSERVABILITY_GUIDE.md)**.
 - Shows application and database health
 
 ### Metrics
