@@ -34,4 +34,9 @@ public class MicroserviceClientConfig {
     public WebClient genericMicroserviceClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder.build();
     }
+
+    @Bean
+    public org.springframework.web.client.RestTemplate restTemplate() {
+        return new org.springframework.web.client.RestTemplate();
+    }
 }

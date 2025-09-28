@@ -1,54 +1,54 @@
-# Guía de Integración para Microservicios
+# Microservice Integration Guide
 
-## 📋 Resumen
+## 📋 Overview
 
-Este microservicio de productos proporciona APIs simples y claras para ser consumido por otros microservicios, específicamente el **microservicio de inventario**.
+This product microservice provides simple and clear APIs to be consumed by other microservices, specifically the **inventory microservice**.
 
-## 🔑 Autenticación
+## 🔑 Authentication
 
-Todas las APIs requieren el header de autenticación:
+All APIs require the authentication header:
 ```
 X-API-Key: your-secret-api-key-here
 ```
 
-## 🎯 APIs Disponibles para Microservicios
+## 🎯 Available APIs for Microservices
 
-### 1. API Pública JSON:API (Recomendada para integraciones externas)
+### 1. Public JSON:API (Recommended for external integrations)
 
 **Base URL:** `http://localhost:8080/api/products`
 
-#### Obtener todos los productos
+#### Get all products
 ```bash
 curl -H "X-API-Key: your-secret-api-key-here" \
      -H "Content-Type: application/vnd.api+json" \
      http://localhost:8080/api/products
 ```
 
-#### Obtener un producto específico
+#### Get a specific product
 ```bash
 curl -H "X-API-Key: your-secret-api-key-here" \
      -H "Content-Type: application/vnd.api+json" \
      http://localhost:8080/api/products/1
 ```
 
-### 2. API Interna Simplificada (Recomendada para microservicios)
+### 2. Simplified Internal API (Recommended for microservices)
 
 **Base URL:** `http://localhost:8080/api/internal/products`
 
-#### Obtener todos los productos (formato simplificado)
+#### Get all products (simplified format)
 ```bash
 curl -H "X-API-Key: your-secret-api-key-here" \
      -H "Content-Type: application/json" \
      http://localhost:8080/api/internal/products
 ```
 
-**Respuesta:**
+**Response:**
 ```json
 {
   "products": [
     {
       "id": 1,
-      "name": "Laptop Dell XPS 13",
+      "name": "Dell XPS 13 Laptop",
       "price": 999.99,
       "availability": true
     }
@@ -57,24 +57,24 @@ curl -H "X-API-Key: your-secret-api-key-here" \
 }
 ```
 
-#### Obtener un producto específico
+#### Get a specific product
 ```bash
 curl -H "X-API-Key: your-secret-api-key-here" \
      -H "Content-Type: application/json" \
      http://localhost:8080/api/internal/products/1
 ```
 
-**Respuesta:**
+**Response:**
 ```json
 {
   "id": 1,
-  "name": "Laptop Dell XPS 13", 
+  "name": "Dell XPS 13 Laptop", 
   "price": 999.99,
   "availability": true
 }
 ```
 
-#### Obtener múltiples productos por IDs
+#### Get multiple products by IDs
 ```bash
 curl -X POST \
      -H "X-API-Key: your-secret-api-key-here" \
@@ -83,14 +83,14 @@ curl -X POST \
      http://localhost:8080/api/internal/products/batch
 ```
 
-#### Verificar disponibilidad de un producto
+#### Check product availability
 ```bash
 curl -H "X-API-Key: your-secret-api-key-here" \
      -H "Content-Type: application/json" \
      http://localhost:8080/api/internal/products/1/availability
 ```
 
-**Respuesta:**
+**Response:**
 ```json
 {
   "productId": 1,
@@ -98,15 +98,15 @@ curl -H "X-API-Key: your-secret-api-key-here" \
 }
 ```
 
-## 🏗️ Integración con Microservicio de Inventario
+## 🏗️ Integration with Inventory Microservice
 
-### Escenario Típico de Uso
+### Typical Usage Scenario
 
-1. **Sincronización de Catálogo:** El microservicio de inventario obtiene todos los productos
-2. **Validación de Producto:** Antes de crear inventario, verifica que el producto existe
-3. **Actualización de Disponibilidad:** Consulta la disponibilidad actual del producto
+1. **Catalog Synchronization:** The inventory microservice gets all products
+2. **Product Validation:** Before creating inventory, verifies that the product exists
+3. **Availability Update:** Queries the current product availability
 
-### Ejemplo de Implementación en Java (Microservicio de Inventario)
+### Java Implementation Example (Inventory Microservice)
 
 ```java
 @Service
@@ -165,49 +165,49 @@ public class ProductService {
 
 ## 🔍 Health Checks
 
-Verificar el estado del microservicio:
+Check the microservice status:
 ```bash
 curl http://localhost:8080/actuator/health
 ```
 
-## 🐳 Configuración de Entornos
+## 🐳 Environment Configuration
 
-### Desarrollo (puerto 8080)
+### Development (port 8080)
 ```bash
 docker compose -f docker-compose.dev.yml up -d
 ```
 
-### Testing (puerto 8082) 
+### Testing (port 8082) 
 ```bash
-# Configurar perfil de test
+# Configure test profile
 java -Dspring.profiles.active=test -jar target/product-api-*.jar
 ```
 
-### Producción
+### Production
 ```bash
-# Variables de entorno para configuración
+# Environment variables for configuration
 export DATABASE_URL=jdbc:postgresql://prod-db:5432/products
 export API_KEY=production-secret-key
 export INVENTORY_SERVICE_URL=http://inventory-service:8080
 ```
 
-## 📊 Monitoreo y Logs
+## 📊 Monitoring and Logs
 
 - **Health Check:** `/actuator/health`
 - **Metrics:** `/actuator/metrics`  
-- **Logs:** Configurados con nivel DEBUG para comunicación entre microservicios
+- **Logs:** Configured with DEBUG level for microservice communication
 
-## ⚠️ Consideraciones Importantes
+## ⚠️ Important Considerations
 
-1. **API Key:** Usa siempre el header `X-API-Key` para autenticación
-2. **Content-Type:** Para API interna usa `application/json`, para API pública usa `application/vnd.api+json`
-3. **Timeouts:** Configura timeouts apropiados en tu WebClient (recomendado: 5 segundos)
-4. **Retry Policy:** Implementa retry con backoff exponencial para llamadas fallidas
-5. **Circuit Breaker:** Considera usar Resilience4j para manejo de fallos
+1. **API Key:** Always use the `X-API-Key` header for authentication
+2. **Content-Type:** For internal API use `application/json`, for public API use `application/vnd.api+json`
+3. **Timeouts:** Configure appropriate timeouts in your WebClient (recommended: 5 seconds)
+4. **Retry Policy:** Implement retry with exponential backoff for failed calls
+5. **Circuit Breaker:** Consider using Resilience4j for failure handling
 
-## 🚀 Próximos Pasos
+## 🚀 Next Steps
 
-1. El microservicio de inventario debe implementar estas llamadas
-2. Configurar service discovery (Eureka) para producción  
-3. Implementar circuit breakers para mayor resiliencia
-4. Añadir métricas de comunicación entre servicios
+1. The inventory microservice should implement these calls
+2. Configure service discovery (Eureka) for production  
+3. Implement circuit breakers for greater resilience
+4. Add communication metrics between services

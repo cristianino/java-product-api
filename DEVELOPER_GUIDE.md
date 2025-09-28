@@ -1,198 +1,198 @@
-# 🚀 Guía del Desarrollador - Product API
+# 🚀 Developer Guide - Product API
 
-## 📋 Tabla de Contenidos
-- [🏗️ Arquitectura del Proyecto](#️-arquitectura-del-proyecto)
-- [🛠️ Configuración del Entorno](#️-configuración-del-entorno)
-- [🚀 Arrancar el Proyecto](#-arrancar-el-proyecto)
-- [🧪 Ejecutar Tests](#-ejecutar-tests)
-- [📊 Reportes de Cobertura](#-reportes-de-cobertura)
+## 📋 Table of Contents
+- [🏗️ Project Architecture](#️-project-architecture)
+- [🛠️ Environment Setup](#️-environment-setup)
+- [🚀 Starting the Project](#-starting-the-project)
+- [🧪 Running Tests](#-running-tests)
+- [📊 Coverage Reports](#-coverage-reports)
 - [🔧 API Endpoints](#-api-endpoints)
-- [🔐 Autenticación](#-autenticación)
+- [🔐 Authentication](#-authentication)
 - [🐳 Docker](#-docker)
-- [📚 Especificación JSON:API](#-especificación-jsonapi)
+- [📚 JSON:API Specification](#-jsonapi-specification)
 - [🎯 Troubleshooting](#-troubleshooting)
 
 ---
 
-## 🏗️ Arquitectura del Proyecto
+## 🏗️ Project Architecture
 
-Este proyecto sigue los principios de **Arquitectura Hexagonal** (Clean Architecture) con las siguientes capas:
+This project follows **Hexagonal Architecture** (Clean Architecture) principles with the following layers:
 
 ```
 src/main/java/com/cristianino/productapi/
-├── 📁 domain/              # Capa de Dominio (Lógica de negocio)
-│   ├── model/              # Entidades de dominio
-│   ├── port/               # Interfaces (puertos)
-│   └── service/            # Servicios de dominio
-├── 📁 application/         # Capa de Aplicación (Casos de uso)
-│   ├── dto/                # DTOs y objetos de transferencia
-│   └── usecase/            # Casos de uso
-├── 📁 infrastructure/      # Capa de Infraestructura (Adaptadores)
-│   ├── config/             # Configuración (Seguridad, OpenAPI)
-│   ├── persistence/        # JPA Entities y Repositories
-│   └── web/                # Controllers REST
-└── ProductApiApplication.java # Clase principal Spring Boot
+├── 📁 domain/              # Domain Layer (Business logic)
+│   ├── model/              # Domain entities
+│   ├── port/               # Interfaces (ports)
+│   └── service/            # Domain services
+├── 📁 application/         # Application Layer (Use cases)
+│   ├── dto/                # DTOs and transfer objects
+│   └── usecase/            # Use cases
+├── 📁 infrastructure/      # Infrastructure Layer (Adapters)
+│   ├── config/             # Configuration (Security, OpenAPI)
+│   ├── persistence/        # JPA Entities and Repositories
+│   └── web/                # REST Controllers
+└── ProductApiApplication.java # Main Spring Boot class
 ```
 
-### 🎯 Principios Aplicados:
-- **DDD (Domain-Driven Design)**: Separación clara de responsabilidades
-- **SOLID**: Principios de diseño orientado a objetos
-- **JSON:API**: Especificación estándar para APIs REST
-- **TDD**: Desarrollo guiado por tests (112 tests implementados)
+### 🎯 Applied Principles:
+- **DDD (Domain-Driven Design)**: Clear separation of responsibilities
+- **SOLID**: Object-oriented design principles
+- **JSON:API**: Standard specification for REST APIs
+- **TDD**: Test-driven development (112 tests implemented)
 
 ---
 
-## 🛠️ Configuración del Entorno
+## 🛠️ Environment Setup
 
-### 📋 Requisitos Previos:
-- **Java 17** o superior
+### 📋 Prerequisites:
+- **Java 17** or higher
 - **Maven 3.9+**
-- **Docker** y **Docker Compose**
-- **PostgreSQL 15** (si no usas Docker)
+- **Docker** and **Docker Compose**
+- **PostgreSQL 15** (if not using Docker)
 
-### 🔧 Variables de Entorno:
+### 🔧 Environment Variables:
 ```bash
-# Base de datos
+# Database
 POSTGRES_DB=productdb
 POSTGRES_USER=productuser
 POSTGRES_PASSWORD=productpass
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 
-# API Key para autenticación
+# API Key for authentication
 API_KEY=your-secret-api-key
 
-# Profile de Spring
+# Spring Profile
 SPRING_PROFILES_ACTIVE=dev
 ```
 
-### 📁 Estructura de Configuración:
+### 📁 Configuration Structure:
 ```
 src/main/resources/
-├── application.yml          # Configuración principal
-├── application-dev.yml      # Configuración desarrollo
-├── application-prod.yml     # Configuración producción
-├── logback-spring.xml       # Configuración de logs
+├── application.yml          # Main configuration
+├── application-dev.yml      # Development configuration
+├── application-prod.yml     # Production configuration
+├── logback-spring.xml       # Logging configuration
 └── db/migration/
-    └── V1__Create_products_table.sql  # Migración Flyway
+    └── V1__Create_products_table.sql  # Flyway migration
 ```
 
 ---
 
-## 🚀 Arrancar el Proyecto
+## 🚀 Starting the Project
 
-### 🐳 Opción 1: Con Docker (Recomendado)
+### 🐳 Option 1: With Docker (Recommended)
 
 ```bash
-# 1. Clonar el repositorio
+# 1. Clone the repository
 git clone https://github.com/cristianino/java-product-api.git
 cd java-product-api
 
-# 2. Levantar la base de datos
+# 2. Start the database
 docker-compose up -d postgres
 
-# 3. Compilar y ejecutar la aplicación
+# 3. Build and run the application
 docker-compose up api
 ```
 
-### 💻 Opción 2: Desarrollo Local
+### 💻 Option 2: Local Development
 
 ```bash
-# 1. Iniciar PostgreSQL
+# 1. Start PostgreSQL
 docker-compose up -d postgres
 
-# 2. Compilar el proyecto
+# 2. Build the project
 mvn clean compile
 
-# 3. Ejecutar la aplicación
+# 3. Run the application
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
-# O alternativamente:
+# Or alternatively:
 java -jar target/java-product-api-1.0.0.jar --spring.profiles.active=dev
 ```
 
-### 🌐 Acceso a la Aplicación:
+### 🌐 Application Access:
 - **API Base URL**: http://localhost:8080
 - **Swagger UI**: http://localhost:8080/swagger-ui/index.html
 - **Actuator Health**: http://localhost:8080/actuator/health
 
 ---
 
-## 🧪 Ejecutar Tests
+## 🧪 Running Tests
 
-### 📊 Suite Completa de Tests (112 tests):
+### 📊 Complete Test Suite (112 tests):
 
 ```bash
-# Ejecutar todos los tests con reporte de cobertura
+# Run all tests with coverage report
 mvn clean test jacoco:report
 
-# Ejecutar solo tests unitarios
+# Run only unit tests
 mvn test -Dtest="*Test"
 
-# Ejecutar solo tests de integración
+# Run only integration tests
 mvn test -Dtest="*IntegrationTest"
 
-# Ejecutar tests con profile específico
+# Run tests with specific profile
 mvn test -Dspring.profiles.active=test
 ```
 
-### 🐳 Ejecutar Tests en Docker:
+### 🐳 Running Tests in Docker:
 
 ```bash
-# Opción completa con Maven en Docker
+# Complete option with Maven in Docker
 docker run --rm -v $(pwd):/app -w /app maven:3.9-eclipse-temurin-17 mvn clean test jacoco:report
 
-# Con docker-compose
+# With docker-compose
 docker-compose run --rm test
 ```
 
-### 📁 Tipos de Tests Implementados:
+### 📁 Implemented Test Types:
 
-#### 🔬 Tests Unitarios:
-- **ProductTest** (21 tests): Tests del modelo de dominio
-- **ProductDtoTest** (10 tests): Tests de DTOs y serialización
-- **ProductUseCaseTest** (14 tests): Tests de casos de uso
-- **JsonApiErrorTest** (9 tests): Tests de manejo de errores
-- **JsonApiResponseTest** (7 tests): Tests de respuestas API
+#### 🔬 Unit Tests:
+- **ProductTest** (21 tests): Domain model tests
+- **ProductDtoTest** (10 tests): DTOs and serialization tests
+- **ProductUseCaseTest** (14 tests): Use case tests
+- **JsonApiErrorTest** (9 tests): Error handling tests
+- **JsonApiResponseTest** (7 tests): API response tests
 
-#### 🔧 Tests de Infraestructura:
-- **ProductRepositoryImplTest** (9 tests): Tests del repositorio JPA
-- **ProductEntityTest** (7 tests): Tests de entidades JPA
-- **SecurityConfigTest** (2 tests): Tests de configuración de seguridad
-- **ApiKeyAuthenticationFilterTest** (6 tests): Tests del filtro de autenticación
+#### 🔧 Infrastructure Tests:
+- **ProductRepositoryImplTest** (9 tests): JPA repository tests
+- **ProductEntityTest** (7 tests): JPA entity tests
+- **SecurityConfigTest** (2 tests): Security configuration tests
+- **ApiKeyAuthenticationFilterTest** (6 tests): Authentication filter tests
 
-#### 🌐 Tests Web:
-- **ProductControllerUnitTest** (10 tests): Tests del controlador (MockMvc)
-- **ProductControllerTest** (3 tests): Tests de integración HTTP
-- **JsonApiRequestTest** (5 tests): Tests de requests JSON:API
+#### 🌐 Web Tests:
+- **ProductControllerUnitTest** (10 tests): Controller tests (MockMvc)
+- **ProductControllerTest** (3 tests): HTTP integration tests
+- **JsonApiRequestTest** (5 tests): JSON:API request tests
 
-#### 📊 Tests de Integración:
-- **ProductIntegrationTest** (9 tests): Tests end-to-end con TestContainers
+#### 📊 Integration Tests:
+- **ProductIntegrationTest** (9 tests): End-to-end tests with TestContainers
 
 ---
 
-## 📊 Reportes de Cobertura
+## 📊 Coverage Reports
 
-### 🎯 Cobertura Actual Lograda:
-- 🔧 **Instrucciones: 88.08%** (1,204/1,367)
-- 🔀 **Ramas: 67.50%** (81/120)
-- 📝 **Líneas: 87.69%** (292/333) ⭐
-- ⚙️ **Métodos: 85.94%** (110/128)
+### 🎯 Current Coverage Achieved:
+- 🔧 **Instructions: 88.08%** (1,204/1,367)
+- 🔀 **Branches: 67.50%** (81/120)
+- 📝 **Lines: 87.69%** (292/333) ⭐
+- ⚙️ **Methods: 85.94%** (110/128)
 
-### 📈 Ver Reportes:
+### 📈 View Reports:
 
 ```bash
-# Generar reporte HTML de JaCoCo
+# Generate JaCoCo HTML report
 mvn jacoco:report
 
-# Ubicación del reporte
+# Report location
 open target/site/jacoco/index.html
 
-# Ver reporte en CSV
+# View CSV report
 cat target/site/jacoco/jacoco.csv
 ```
 
-### 🏆 Clases con Cobertura Completa (100%):
+### 🏆 Classes with Complete Coverage (100%):
 - ProductController
 - ProductEntity  
 - ProductRepositoryImpl
@@ -205,24 +205,24 @@ cat target/site/jacoco/jacoco.csv
 
 ## 🔧 API Endpoints
 
-### 📝 Productos API:
+### 📝 Products API:
 
-| Método | Endpoint | Descripción | Auth |
+| Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
-| `GET` | `/api/products` | Listar todos los productos | ❌ |
-| `GET` | `/api/products/{id}` | Obtener producto por ID | ❌ |
-| `POST` | `/api/products` | Crear nuevo producto | ✅ |
-| `PUT` | `/api/products/{id}` | Actualizar producto | ✅ |
-| `DELETE` | `/api/products/{id}` | Eliminar producto | ✅ |
+| `GET` | `/api/products` | List all products | ❌ |
+| `GET` | `/api/products/{id}` | Get product by ID | ❌ |
+| `POST` | `/api/products` | Create new product | ✅ |
+| `PUT` | `/api/products/{id}` | Update product | ✅ |
+| `DELETE` | `/api/products/{id}` | Delete product | ✅ |
 
 ### 📋 Actuator Endpoints:
-| Endpoint | Descripción |
+| Endpoint | Description |
 |----------|-------------|
-| `/actuator/health` | Estado de salud |
-| `/actuator/info` | Información de la aplicación |
-| `/actuator/metrics` | Métricas de la aplicación |
+| `/actuator/health` | Health status |
+| `/actuator/info` | Application information |
+| `/actuator/metrics` | Application metrics |
 
-### 📖 Ejemplo de Request JSON:API:
+### 📖 JSON:API Request Example:
 
 ```json
 POST /api/products
@@ -233,14 +233,14 @@ X-API-Key: your-secret-api-key
   "data": {
     "type": "products",
     "attributes": {
-      "name": "Laptop Gaming",
+      "name": "Gaming Laptop",
       "price": 1299.99
     }
   }
 }
 ```
 
-### 📖 Ejemplo de Response JSON:API:
+### 📖 JSON:API Response Example:
 
 ```json
 HTTP/1.1 201 Created
@@ -260,18 +260,18 @@ Content-Type: application/vnd.api+json
 
 ---
 
-## 🔐 Autenticación
+## 🔐 Authentication
 
 ### 🔑 API Key Authentication:
 
-El proyecto utiliza autenticación por API Key en el header:
+The project uses API Key authentication in the header:
 
 ```bash
-# Header requerido para endpoints protegidos
+# Required header for protected endpoints
 X-API-Key: your-secret-api-key
 ```
 
-### ⚙️ Configuración de Seguridad:
+### ⚙️ Security Configuration:
 
 ```yaml
 # application.yml
@@ -281,21 +281,21 @@ api:
     enabled: true
 ```
 
-### 🔒 Endpoints Protegidos:
-- `POST /api/products` - Crear producto
-- `PUT /api/products/{id}` - Actualizar producto  
-- `DELETE /api/products/{id}` - Eliminar producto
+### 🔒 Protected Endpoints:
+- `POST /api/products` - Create product
+- `PUT /api/products/{id}` - Update product  
+- `DELETE /api/products/{id}` - Delete product
 
-### 🌐 Endpoints Públicos:
-- `GET /api/products` - Listar productos
-- `GET /api/products/{id}` - Obtener producto
+### 🌐 Public Endpoints:
+- `GET /api/products` - List products
+- `GET /api/products/{id}` - Get product
 - `/actuator/health` - Health check
 
 ---
 
 ## 🐳 Docker
 
-### 📁 Archivos Docker:
+### 📁 Docker Files:
 
 #### 🐳 Dockerfile:
 ```dockerfile
@@ -332,42 +332,42 @@ services:
       POSTGRES_HOST: postgres
 ```
 
-### 🚀 Comandos Docker:
+### 🚀 Docker Commands:
 
 ```bash
-# Construir imagen
+# Build image
 docker build -t java-product-api .
 
-# Ejecutar solo la BD
+# Run only the DB
 docker-compose up -d postgres
 
-# Ejecutar todo el stack
+# Run the entire stack
 docker-compose up
 
-# Ver logs
+# View logs
 docker-compose logs -f api
 
-# Parar servicios
+# Stop services
 docker-compose down
 
-# Limpiar volúmenes
+# Clean volumes
 docker-compose down -v
 ```
 
 ---
 
-## 📚 Especificación JSON:API
+## 📚 JSON:API Specification
 
-Este proyecto implementa la especificación [JSON:API v1.1](https://jsonapi.org/):
+This project implements the [JSON:API v1.1](https://jsonapi.org/) specification:
 
-### 🎯 Características Implementadas:
-- ✅ Estructura de documentos estándar (`data`, `type`, `id`, `attributes`)
-- ✅ Manejo de errores con formato JSON:API
+### 🎯 Implemented Features:
+- ✅ Standard document structure (`data`, `type`, `id`, `attributes`)
+- ✅ Error handling with JSON:API format
 - ✅ Headers `Content-Type: application/vnd.api+json`
-- ✅ Códigos de estado HTTP correctos
-- ✅ Validación de requests
+- ✅ Correct HTTP status codes
+- ✅ Request validation
 
-### 📋 Formato de Error JSON:API:
+### 📋 JSON:API Error Format:
 ```json
 {
   "errors": [
@@ -388,97 +388,97 @@ Este proyecto implementa la especificación [JSON:API v1.1](https://jsonapi.org/
 
 ## 🎯 Troubleshooting
 
-### ❌ Problemas Comunes:
+### ❌ Common Issues:
 
-#### 🐘 Error de Conexión a PostgreSQL:
+#### 🐘 PostgreSQL Connection Error:
 ```bash
-# Verificar que PostgreSQL esté corriendo
+# Verify PostgreSQL is running
 docker-compose ps
 
-# Ver logs de PostgreSQL  
+# View PostgreSQL logs  
 docker-compose logs postgres
 
-# Reiniciar servicios
+# Restart services
 docker-compose restart postgres
 ```
 
-#### 🔑 Error de API Key:
+#### 🔑 API Key Error:
 ```bash
-# Verificar que el header esté incluido
+# Verify the header is included
 curl -H "X-API-Key: your-key" http://localhost:8080/api/products
 
-# Error típico: 403 Forbidden sin API Key
+# Typical error: 403 Forbidden without API Key
 ```
 
-#### 🧪 Fallos en Tests:
+#### 🧪 Test Failures:
 ```bash
-# Limpiar y recompilar
+# Clean and recompile
 mvn clean compile test
 
-# Ejecutar test específico
+# Run specific test
 mvn test -Dtest=ProductTest
 
-# Ver logs detallados
+# View detailed logs
 mvn test -X
 ```
 
-#### 🐳 Problemas con Docker:
+#### 🐳 Docker Issues:
 ```bash
-# Limpiar contenedores
+# Clean containers
 docker-compose down
 docker system prune -f
 
-# Reconstruir imágenes
+# Rebuild images
 docker-compose build --no-cache
 
-# Verificar recursos
+# Check resources
 docker stats
 ```
 
-### 📊 Verificación de Salud:
+### 📊 Health Verification:
 
 ```bash
-# Health check de la aplicación
+# Application health check
 curl http://localhost:8080/actuator/health
 
-# Respuesta esperada:
+# Expected response:
 # {"status":"UP"}
 
-# Verificar conectividad de BD
+# Verify DB connectivity
 curl http://localhost:8080/actuator/health/db
 ```
 
-### 🔍 Logs y Debugging:
+### 🔍 Logs and Debugging:
 
 ```bash
-# Ver logs de la aplicación
+# View application logs
 docker-compose logs -f api
 
-# Logs con timestamp
+# Logs with timestamp
 docker-compose logs -t api
 
-# Logs de los últimos 100 líneas
+# Last 100 lines of logs
 docker-compose logs --tail=100 api
 ```
 
 ---
 
-## 📈 Métricas de Proyecto
+## 📈 Project Metrics
 
-### 🧪 **Tests Coverage**:
+### 🧪 **Test Coverage**:
 - **Total Tests**: 112 ✅
 - **Test Files**: 13
 - **Line Coverage**: 87.69%
 - **Branch Coverage**: 67.50%
 - **Method Coverage**: 85.94%
 
-### 📁 **Estructura del Código**:
+### 📁 **Code Structure**:
 - **Main Classes**: 16
 - **Test Classes**: 13
 - **Lines of Code**: ~2,500
 - **Packages**: 8
 
-### 🏗️ **Tecnologías**:
+### 🏗️ **Technologies**:
 - **Spring Boot**: 3.2.0
 - **Java**: 17
 - **PostgreSQL**: 15
@@ -490,36 +490,36 @@ docker-compose logs --tail=100 api
 
 ---
 
-## 👥 Contribuir al Proyecto
+## 👥 Contributing to the Project
 
-### 🔄 Workflow de Desarrollo:
+### 🔄 Development Workflow:
 
-1. **Fork** del repositorio
-2. **Crear branch** para feature: `git checkout -b feature/nueva-funcionalidad`
-3. **Escribir tests** primero (TDD)
-4. **Implementar** funcionalidad
-5. **Ejecutar tests**: `mvn test`
-6. **Verificar cobertura**: `mvn jacoco:report`
-7. **Commit** con mensaje descriptivo
-8. **Push** y crear **Pull Request**
+1. **Fork** the repository
+2. **Create branch** for feature: `git checkout -b feature/new-functionality`
+3. **Write tests** first (TDD)
+4. **Implement** functionality
+5. **Run tests**: `mvn test`
+6. **Verify coverage**: `mvn jacoco:report`
+7. **Commit** with descriptive message
+8. **Push** and create **Pull Request**
 
-### ✅ Checklist de PR:
-- [ ] Tests pasan (112/112 ✅)
-- [ ] Cobertura >85%
-- [ ] Documentación actualizada
-- [ ] Código formateado
+### ✅ PR Checklist:
+- [ ] Tests pass (112/112 ✅)
+- [ ] Coverage >85%
+- [ ] Documentation updated
+- [ ] Code formatted
 - [ ] No breaking changes
 
 ---
 
-## 📞 Soporte
+## 📞 Support
 
-### 🐛 Reportar Issues:
-- **GitHub Issues**: [Crear nuevo issue](https://github.com/cristianino/java-product-api/issues)
-- **Documentación**: Este archivo (DEVELOPER_GUIDE.md)
+### 🐛 Report Issues:
+- **GitHub Issues**: [Create new issue](https://github.com/cristianino/java-product-api/issues)
+- **Documentation**: This file (DEVELOPER_GUIDE.md)
 - **Swagger UI**: http://localhost:8080/swagger-ui/
 
-### 📚 Recursos Adicionales:
+### 📚 Additional Resources:
 - [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 - [JSON:API Specification](https://jsonapi.org/)
 - [Maven Documentation](https://maven.apache.org/guides/)
@@ -527,6 +527,6 @@ docker-compose logs --tail=100 api
 
 ---
 
-**🎉 ¡Happy Coding!** 
+**🎉 Happy Coding!** 
 
-*Última actualización: Septiembre 2025*
+*Last updated: September 2025*
