@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/connectivity")
-@Tag(name = "Connectivity", description = "Microservice connectivity operations")
+@Tag(name = "Connectivity & Health", description = "🔗 Microservice Health Monitoring & Inter-Service Connectivity")
 @SecurityRequirement(name = "X-API-Key")
 public class ConnectivityController {
     
@@ -23,7 +23,15 @@ public class ConnectivityController {
     }
     
     @GetMapping("/inventory")
-    @Operation(summary = "Check connectivity with Inventory microservice")
+    @Operation(summary = "Check Inventory Service Connectivity", 
+               description = "Verifies connectivity with the Inventory microservice.\n\n" +
+                           "**Returns:**\n" +
+                           "- `status: UP` - Service is reachable and healthy\n" +
+                           "- `status: DOWN` - Service is unreachable or unhealthy\n\n" +
+                           "**Use cases:**\n" +
+                           "- Health monitoring\n" +
+                           "- Load balancer checks\n" +
+                           "- Integration testing")
     public ResponseEntity<Map<String, Object>> checkInventoryConnectivity() {
         Map<String, Object> connectivityResult = inventoryConnectivityService.checkInventoryConnectivity();
         
@@ -36,7 +44,17 @@ public class ConnectivityController {
     }
     
     @GetMapping("/status")
-    @Operation(summary = "Get overall connectivity status for all microservices")
+    @Operation(summary = "Overall Connectivity Status", 
+               description = "Comprehensive health check for all microservice dependencies.\n\n" +
+                           "**Response includes:**\n" +
+                           "- Product API status (always UP if responding)\n" +
+                           "- Inventory API connectivity status\n" +
+                           "- Overall system health (`UP` or `DEGRADED`)\n" +
+                           "- Timestamp for monitoring\n\n" +
+                           "**Perfect for:**\n" +
+                           "- System dashboards\n" +
+                           "- Monitoring alerts\n" +
+                           "- Service mesh health checks")
     public ResponseEntity<Map<String, Object>> getConnectivityStatus() {
         Map<String, Object> overallStatus = new HashMap<>();
         

@@ -151,4 +151,79 @@ class ProductDtoTest {
         assertTrue(toString.contains("products"));
         assertTrue(toString.contains("1"));
     }
+
+    @Test
+    void productAttributes_Equals_SameValues_ReturnsTrue() {
+        // Given
+        ProductDto.ProductAttributes attr1 = new ProductDto.ProductAttributes("Product", new BigDecimal("50.00"));
+        ProductDto.ProductAttributes attr2 = new ProductDto.ProductAttributes("Product", new BigDecimal("50.00"));
+
+        // When & Then
+        assertEquals(attr1, attr2);
+        assertEquals(attr1.hashCode(), attr2.hashCode());
+    }
+
+    @Test
+    void productAttributes_Equals_DifferentValues_ReturnsFalse() {
+        // Given
+        ProductDto.ProductAttributes attr1 = new ProductDto.ProductAttributes("Product1", new BigDecimal("50.00"));
+        ProductDto.ProductAttributes attr2 = new ProductDto.ProductAttributes("Product2", new BigDecimal("60.00"));
+
+        // When & Then
+        assertNotEquals(attr1, attr2);
+    }
+
+    @Test
+    void productAttributes_Equals_WithNull_ReturnsFalse() {
+        // Given
+        ProductDto.ProductAttributes attr = new ProductDto.ProductAttributes("Product", new BigDecimal("50.00"));
+
+        // When & Then
+        assertNotEquals(attr, null);
+        assertNotEquals(null, attr);
+    }
+
+    @Test
+    void productDto_Equals_SameValues_ReturnsTrue() {
+        // Given
+        ProductDto.ProductAttributes attributes = new ProductDto.ProductAttributes("Test", new BigDecimal("99.99"));
+        ProductDto dto1 = new ProductDto("1", "Test", new BigDecimal("99.99"));
+        ProductDto dto2 = new ProductDto("1", "Test", new BigDecimal("99.99"));
+
+        // When & Then
+        assertEquals(dto1, dto2);
+        assertEquals(dto1.hashCode(), dto2.hashCode());
+    }
+
+    @Test
+    void productDto_Equals_DifferentValues_ReturnsFalse() {
+        // Given
+        ProductDto dto1 = new ProductDto("1", "Test1", new BigDecimal("99.99"));
+        ProductDto dto2 = new ProductDto("2", "Test2", new BigDecimal("199.99"));
+
+        // When & Then
+        assertNotEquals(dto1, dto2);
+    }
+
+    @Test
+    void productDto_Equals_WithNull_ReturnsFalse() {
+        // Given
+        ProductDto dto = new ProductDto("1", "Test", new BigDecimal("99.99"));
+
+        // When & Then
+        assertNotEquals(dto, null);
+    }
+
+    @Test
+    void productAttributes_ToString_ContainsAllFields() {
+        // Given
+        ProductDto.ProductAttributes attributes = new ProductDto.ProductAttributes("Test Product", new BigDecimal("99.99"));
+
+        // When
+        String toString = attributes.toString();
+
+        // Then
+        assertTrue(toString.contains("Test Product"));
+        assertTrue(toString.contains("99.99"));
+    }
 }
