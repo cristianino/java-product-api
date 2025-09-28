@@ -4,31 +4,229 @@
 - **🔄 Flyway** database migrations  
 - **📚 Swagger/OpenAPI** documentation with microservice examples
 - **💊 Health checks** with microservice connectivity monitoring
-- **🔗 Connectivity endpoints** for verifying com**📊 Test Coverage Achieved:**
-- **✅ 47 tests** implemented across all layers:
-  - **🧪 30 Unit Tests**: Domain, Application, and Infrastructure layer testing
-  - **🔗 17 Integration Tests**: End-to-end API testing with TestContainers
+- **🔗 Connectivity endpoints** for verifying com## 🧪 Testing and Code Quality
+
+### Test Coverage
+- **✅ 47 tests implemented** distributed across all layers:
+  - **🔬 30 Unit Tests**: Domain, Application, and Infrastructure
+  - **🔗 17 Integration Tests**: End-to-end with TestContainers
 - **🎯 88% instruction coverage** (1,204/1,367 instructions)
-- **📈 Coverage by Package:**
-  - Infrastructure layer: **100%** coverage
-  - Application UseCase: **96%** coverage  
-  - Domain Model: **95%** coverage
-  - Application DTO: **82%** coverage
-  - Domain Service: **42%** coverage
-  - Main Application Class: **37%** coverage
 
-**📝 Coverage Analysis:**
-- **Target**: 90% total coverage
-- **Current**: 88% total coverage 
-- **Gap**: 2 percentage points (≈27 instructions)
-- **Status**: Comprehensive test suite with room for domain service improvements
+### Coverage Distribution by Package
+| Layer | Coverage | Status |
+|-------|----------|--------|
+| **Infrastructure layer** | **100%** | ✅ Complete |
+| **Application UseCase** | **96%** | ✅ Excellent |
+| **Domain Model** | **95%** | ✅ Excellent |
+| **Application DTO** | **82%** | ✅ Good |
+| **Domain Service** | **42%** | ⚠️ Improvable |
+| **Main Application Class** | **37%** | ⚠️ Improvable |
 
-*For detailed testing information, see [Developer Guide](DEVELOPER_GUIDE.md#-ejecutar-tests)*her microservices
+### Running Tests
+
+```bash
+# Run all tests
+mvn clean test
+
+# Run tests with coverage report
+mvn clean test jacoco:report
+
+# View coverage report
+open target/site/jacoco/index.html
+```
+
+### Types of Tests Implemented
+
+#### Unit Tests (30)
+- **Domain Model Tests**: Entity and domain logic validation
+- **UseCase Tests**: Use case testing with mocks
+- **DTO Tests**: Data transformation validation
+- **Infrastructure Tests**: Adapter testing
+
+#### Integration Tests (17)
+- **API Tests**: End-to-end REST endpoint testing  
+- **Database Tests**: PostgreSQL integration using TestContainers
+- **Security Tests**: Authentication and authorization validation
+- **Health Check Tests**: Health endpoint verification
+
+## 🔍 API Verification and Testing
+
+### Quick System Verification
+
+```bash
+# 1. Verify all services are running
+docker-compose ps
+
+# 2. Test application health check
+curl http://localhost:8080/actuator/health
+
+# 3. Test main endpoint with API Key
+curl -H "X-API-Key: dev_api_key_for_local_development_12345" \
+     http://localhost:8080/api/v1/products
+
+# 4. Verify microservice connectivity
+curl -H "X-API-Key: dev_api_key_for_local_development_12345" \
+     http://localhost:8080/api/connectivity/status
+```
+
+### API Usage Examples
+
+#### Get all products
+```bash
+curl -H "X-API-Key: dev_api_key_for_local_development_12345" \
+     -H "Accept: application/vnd.api+json" \
+     http://localhost:8080/api/v1/products
+```
+
+#### Get a specific product
+```bash
+curl -H "X-API-Key: dev_api_key_for_local_development_12345" \
+     -H "Accept: application/vnd.api+json" \
+     http://localhost:8080/api/v1/products/1
+```
+
+#### Create a new product
+```bash
+curl -X POST \
+     -H "X-API-Key: dev_api_key_for_local_development_12345" \
+     -H "Content-Type: application/vnd.api+json" \
+     -d '{
+       "data": {
+         "type": "products",
+         "attributes": {
+           "name": "New Product",
+           "price": 199.99
+         }
+       }
+     }' \
+     http://localhost:8080/api/v1/products
+```
+
+#### Update a product
+```bash
+curl -X PUT \
+     -H "X-API-Key: dev_api_key_for_local_development_12345" \
+     -H "Content-Type: application/vnd.api+json" \
+     -d '{
+       "data": {
+         "type": "products",
+         "id": "1",
+         "attributes": {
+           "name": "Updated Product",
+           "price": 299.99
+         }
+       }
+     }' \
+     http://localhost:8080/api/v1/products/1
+```
+
+### Monitoring and Observability
+
+#### Access Grafana
+1. Open http://localhost:3000
+2. Login: `admin` / `admin123`
+3. Go to Dashboards → Java Product API Logs
+4. View application metrics
+
+#### View structured logs
+```bash
+# View application logs
+docker-compose logs -f java-product-api
+
+# View specific query logs
+docker-compose logs java-product-api | grep "GET /api/v1/products"
+```
+
+*For detailed testing information, see [Developer Guide](DEVELOPER_GUIDE.md#-running-tests)*her microservices
 - **📝 Structured JSON logging** for Loki/Grafanatation](http://localhost:8080/swagger-ui/index.html)** - Interactive Swagger UI (when running)
 - **🏥 [Health Check](http://localhost:8080/actuator/health)** - Application health status
 - **🔗 [Connectivity Status](http://localhost:8080/api/connectivity/status)** - Microservice connectivity monitoringct API
 
-A Spring Boot 3 microservice for managing products with **simple and clear APIs** designed for microservice communication. Features JSON:API specification, Hexagonal Architecture, PostgreSQL, and Docker support.
+# Java Product API
+
+A REST API developed with Spring Boot 3 for product management, designed as part of a microservices architecture. Implements modern design patterns, complete observability, and is production-ready.
+
+## 📋 Project Description
+
+This API is part of a **backend technical assessment** that demonstrates:
+
+- **Hexagonal Architecture** with clear separation of concerns
+- **RESTful APIs** following JSON:API and OpenAPI standards
+- **Security** through API Key authentication
+- **Complete observability** with Loki, Grafana, and Promtail
+- **Containerization** with Docker and Docker Compose
+- **Robust testing** with 88% coverage (47 tests implemented)
+- **Comprehensive technical documentation** and integration guides
+
+## 🏗️ Technical Features
+
+### Core Framework
+- **Spring Boot 3.2.0** with Java 17
+- **Spring Data JPA** for persistence
+- **Spring Security** for authentication
+- **Flyway** for database migrations
+
+### Architecture and Patterns
+- **Hexagonal Architecture** (Domain, Application, Infrastructure)
+- **Domain-Driven Design** with domain entities and services
+- **Dependency Injection** and SOLID principles
+- **API Versioning** with URI Path strategy
+
+### Observability and Monitoring
+- **Structured Logging** with JSON format for Loki
+- **Custom Health Checks** for microservices
+- **Grafana Dashboards** for real-time monitoring
+- **Connectivity Endpoints** to verify service status
+
+### Testing and Quality
+- **88% code coverage** (target: 90%)
+- **47 tests implemented**: 30 unit + 17 integration tests
+- **TestContainers** for PostgreSQL integration testing
+- **JaCoCo** for coverage reports
+
+## 📚 Technical Documentation
+
+| Document | Description |
+|----------|-------------|
+| **🚀 [Developer Guide](DEVELOPER_GUIDE.md)** | Complete development and setup guide |
+| **🔗 [Microservice Integration](MICROSERVICE_INTEGRATION.md)** | Integration guide for microservices |
+| **💡 [Integration Examples](INTEGRATION_EXAMPLES.md)** | Practical API usage examples |
+| **📊 [Observability Guide](OBSERVABILITY_GUIDE.md)** | Loki + Grafana setup and usage |
+| **📖 [API Versioning Guide](API_VERSIONING_GUIDE.md)** | API versioning strategy |
+| **📝 [Microservice Status](MICROSERVICE_STATUS.md)** | Current architecture status |
+
+## 🌐 Important Links
+
+- **📖 [API Documentation](http://localhost:8080/swagger-ui/index.html)** - Interactive Swagger UI
+- **🏥 [Health Check](http://localhost:8080/actuator/health)** - Application status
+- **🔗 [Connectivity Status](http://localhost:8080/api/connectivity/status)** - Microservices monitoring
+- **📊 [Grafana Dashboard](http://localhost:3000)** - Observability dashboards
+
+## 🎯 Main Features
+
+### REST APIs
+- **JSON:API compliant** endpoints for external integrations  
+- **Simple JSON** endpoints optimized for microservice communication
+- **API Versioning** with stable V1.0 and V2.0 roadmap
+- **Robust validation** of input data
+
+### Security
+- **API Key Authentication** via `X-API-Key` header
+- **CORS** configured for development and production
+- **Input validation** with Bean Validation
+- **Security headers** configured
+
+### Persistence
+- **PostgreSQL** as primary database
+- **JPA/Hibernate** for ORM
+- **Flyway** for database version control
+- **Optimized connection pooling**
+
+### Observability
+- **Structured JSON logging** for Loki aggregation
+- **Custom metrics** for Grafana dashboards
+- **Custom health indicators**
+- **Distributed tracing** ready
 
 ## 📚 Documentation
 
@@ -56,32 +254,161 @@ A Spring Boot 3 microservice for managing products with **simple and clear APIs*
 - **🧪 Unit & Integration tests** with JUnit and Testcontainers
 - **🐳 Docker** support with multi-environment configurations
 
-## Architecture
+## 🏛️ System Architecture
 
-The application follows Hexagonal Architecture with clear separation of concerns:
+### Hexagonal Architecture (Ports & Adapters)
+
+The application implements **Hexagonal Architecture** to keep the domain independent of external frameworks and technologies:
 
 ```
 src/main/java/com/cristianino/productapi/
-├── domain/
-│   ├── model/           # Product entity
-│   ├── port/            # Repository interfaces
-│   └── service/         # Domain business logic
-├── application/
-│   ├── dto/             # Data Transfer Objects & JSON:API structures
-│   └── usecase/         # Application services
-└── infrastructure/
-    ├── config/          # Security, OpenAPI, etc.
-    ├── persistence/     # JPA entities & repository implementations
-    └── web/             # REST controllers
+├── 🎯 domain/                    # BUSINESS CORE
+│   ├── model/                   # Domain entities (Product)
+│   ├── port/                    # Interfaces (ProductRepository)
+│   └── service/                 # Pure business logic
+├── 🔄 application/              # USE CASES
+│   ├── dto/                     # DTOs and JSON:API structures
+│   └── usecase/                 # Application services (ProductUseCase)
+└── 🔧 infrastructure/           # EXTERNAL ADAPTERS
+    ├── config/                  # Configurations (Security, OpenAPI)
+    ├── persistence/             # JPA adapters (ProductEntity, Repository)
+    ├── service/                 # Infrastructure services
+    ├── util/                    # Utilities and helpers
+    └── web/                     # REST controllers
 ```
 
-## Quick Start
+### Applied Design Principles
+
+- **🎯 Domain-Driven Design**: Domain is completely isolated
+- **🔄 Dependency Inversion**: Dependencies point towards the domain
+- **🔧 Single Responsibility**: Each layer has a specific responsibility
+- **📦 Clean Code**: Readable, maintainable, and testable code
+
+### Implemented Patterns
+
+| Pattern | Location | Purpose |
+|---------|----------|---------|
+| **Repository** | `domain/port/` | Persistence abstraction |
+| **Use Case** | `application/usecase/` | Business logic orchestration |
+| **DTO** | `application/dto/` | Data transfer |
+| **Entity** | `domain/model/` | Domain modeling |
+| **Adapter** | `infrastructure/` | Port implementations |
+
+### Technology Stack
+
+#### Backend Core
+- **Spring Boot 3.2.0** - Main framework
+- **Spring Data JPA** - Persistence and ORM
+- **Spring Security** - Authentication and authorization
+- **Spring Web** - REST APIs
+- **Flyway** - Database migrations
+
+#### Database
+- **PostgreSQL 15** - Primary database
+- **HikariCP** - Connection pooling
+- **JPA/Hibernate** - ORM
+
+#### Observability
+- **Grafana 10.1.0** - Dashboards and visualization
+- **Loki 2.9.0** - Log aggregation
+- **Promtail 2.9.0** - Log collection
+- **Logback** - Structured logging
+
+#### Testing
+- **JUnit 5** - Testing framework
+- **TestContainers** - Integration tests
+- **Mockito** - Mocking
+- **JaCoCo** - Code coverage
+
+#### DevOps
+- **Docker & Docker Compose** - Containerization
+- **Maven** - Build and dependency management
+- **OpenAPI 3** - API documentation
+
+## 🚀 Installation and Setup
 
 ### Prerequisites
 
-- Java 17+
-- Maven 3.6+
-- Docker & Docker Compose (for full setup)
+- **Java 17+** (OpenJDK or Oracle JDK)
+- **Maven 3.6+** for build and dependency management
+- **Docker & Docker Compose** for complete environment
+- **Git** for repository cloning
+
+### 🐳 Quick Start with Docker (Recommended)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/cristianino/java-product-api.git
+cd java-product-api
+
+# 2. Setup environment variables
+cp .env.example .env
+# Edit .env with your configurations if needed
+
+# 3. Start all services
+docker-compose up --build -d
+
+# 4. Verify all services are running
+docker-compose ps
+
+# 5. Test the API
+curl -H "X-API-Key: dev_api_key_for_local_development_12345" \
+     http://localhost:8080/api/v1/products
+```
+
+### 🔧 Local Development
+
+```bash
+# 1. Setup local PostgreSQL database
+# Create 'productdb' database with 'productuser' user
+
+# 2. Configure application-dev.yml with your credentials
+
+# 3. Run the application
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+
+# 4. Run tests
+mvn clean test jacoco:report
+```
+
+### 🌐 Access URLs
+
+Once services are running, you'll have access to:
+
+| Service | URL | Credentials |
+|---------|-----|-------------|
+| **Product API** | http://localhost:8080 | API Key: `dev_api_key_for_local_development_12345` |
+| **Swagger UI** | http://localhost:8080/swagger-ui.html | - |
+| **Health Check** | http://localhost:8080/actuator/health | - |
+| **Grafana** | http://localhost:3000 | admin / admin123 |
+| **PostgreSQL** | localhost:5432 | productuser / dev_password_123 |
+
+### ⚙️ Environment Configuration
+
+#### Main Environment Variables
+
+```bash
+# Database
+POSTGRES_DB=productdb
+POSTGRES_USER=productuser
+POSTGRES_PASSWORD=dev_password_123
+
+# Application
+SPRING_PROFILES_ACTIVE=dev
+APP_API_KEY=dev_api_key_for_local_development_12345
+
+# Grafana
+GRAFANA_ADMIN_PASSWORD=admin123
+
+# JVM (Production)
+JAVA_OPTS=-Xms1g -Xmx2g -XX:+UseG1GC
+```
+
+#### Spring Profiles
+
+- **`dev`**: Local development with detailed logs
+- **`prod`**: Production with structured JSON logs
+- **`test`**: Testing with in-memory database
 
 ## 🚀 Simple API for Microservices
 
@@ -546,6 +873,90 @@ docker run -p 8080:8080 \
 - 🔧 API examples
 - 🐳 Docker workflows
 - 🎯 Troubleshooting
+
+## 🚀 Recommended Future Improvements
+
+### 📊 Observability and Monitoring
+
+#### Isolate Grafana in a dedicated container
+- **Current issue**: Grafana is included in the same docker-compose as the application
+- **Recommended solution**: 
+  - Move Grafana to a dedicated cluster or separate docker-compose
+  - Implement Grafana as a managed service (Grafana Cloud or similar)
+  - Configure dashboards as code with automatic provisioning
+- **Benefits**: 
+  - Separation of concerns between application and observability
+  - Independent scalability of monitoring tools
+  - Better management of centralized configurations and dashboards
+
+### 🗄️ Database and Persistence
+
+#### Replace containerized PostgreSQL with managed service
+- **Current issue**: PostgreSQL running in Docker containers
+- **Recommended solution**:
+  - **AWS RDS PostgreSQL** for AWS environments
+  - **Google Cloud SQL** for GCP environments
+  - **Azure Database for PostgreSQL** for Azure environments
+  - **Implement external connection pooling** (PgBouncer)
+- **Benefits**:
+  - Automatic backups and point-in-time recovery
+  - High availability and automatic failover
+  - Managed vertical and horizontal scalability
+  - Automatic security updates
+  - Integrated monitoring and alerts
+
+### 🏗️ Architecture and Scalability
+
+#### Service Mesh Implementation
+- **Istio** or **Linkerd** for microservice communication
+- Automatic **circuit breakers** and **retry policies**
+- Network-level **observability** (distributed tracing)
+
+#### API Gateway
+- **Kong**, **Ambassador**, or **AWS API Gateway**
+- Centralized authentication and rate limiting
+- Intelligent routing and load balancing
+
+#### Event-Driven Architecture
+- **Apache Kafka** or **AWS EventBridge** for asynchronous events
+- **CQRS** pattern to separate commands from queries
+- **Event Sourcing** for complete audit trail
+
+### 🔐 Security
+
+#### Advanced Authentication and Authorization
+- **OAuth 2.0** with **JWT tokens**
+- **Role-Based Access Control (RBAC)**
+- **Integration with Identity Providers** (Auth0, Keycloak)
+
+#### Secrets Management
+- **HashiCorp Vault** or **AWS Secrets Manager**
+- **Automatic credential rotation**
+- **Encryption at rest** and **in transit**
+
+### 🧪 Testing and Quality
+
+#### Achieve 90%+ coverage
+- Implement missing tests in **Domain Services** (currently 42%)
+- **Mutation testing** with PIT
+- **Contract testing** with Pact
+
+#### Advanced CI/CD
+- **Multi-environment deployment pipeline**
+- **Blue-Green deployments** or **Canary releases**
+- **Automated rollback** on errors
+
+### 📈 Performance and Scalability
+
+#### Caching Strategy
+- **Redis** for distributed caching
+- **CDN** for static content
+- **Database query optimization** and indexing
+
+#### Horizontal Scaling
+- **Kubernetes** for container orchestration
+- **Horizontal Pod Autoscaler** based on metrics
+- **Distributed session management**
 
 ## Contributing
 

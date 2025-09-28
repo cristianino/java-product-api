@@ -55,7 +55,6 @@ services:
         condition: service_healthy
     networks:
       - dev-network
-    restart: unless-stopped
     logging:
       driver: "json-file"
       options:

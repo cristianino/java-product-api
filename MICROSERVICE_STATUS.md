@@ -1,75 +1,75 @@
-# Estado del Microservicio - Preparación Completa
+# Microservice Status - Complete Preparation
 
-## 🎯 Objetivo Alcanzado
+## 🎯 Objective Achieved
 
-Tu microservicio de productos está **completamente preparado** para ser consumido por otro microservicio de inventario. Hemos simplificado la arquitectura para lograr **claridad y simplicidad** en la integración.
+Your product microservice is **completely prepared** to be consumed by another inventory microservice. We have simplified the architecture to achieve **clarity and simplicity** in integration.
 
-## ✅ Estado Actual
+## ✅ Current Status
 
-### Aplicación Principal
-- ✅ **Funcionando correctamente** en puerto `8080`
-- ✅ **API Key autenticación** configurada
-- ✅ **JSON:API v1.1** formato estándar implementado
-- ✅ **Health checks** disponibles via Actuator
-- ✅ **Swagger/OpenAPI** documentación automática
-- ✅ **PostgreSQL** base de datos productiva
-- ✅ **Docker** ambiente completo de desarrollo
+### Main Application
+- ✅ **Running correctly** on port `8080`
+- ✅ **API Key authentication** configured
+- ✅ **JSON:API v1.1** standard format implemented
+- ✅ **Health checks** available via Actuator
+- ✅ **Swagger/OpenAPI** automatic documentation
+- ✅ **PostgreSQL** production database
+- ✅ **Docker** complete development environment
 
-### Endpoints Disponibles para Integración
+### Available Endpoints for Integration
 ```bash
-# Health Check (sin autenticación)
+# Health Check (no authentication)
 GET http://localhost:8080/actuator/health
 
-# Productos - Listar todos
+# Products - List all
 GET http://localhost:8080/api/products
 Header: X-API-KEY: your-secret-api-key-here
 
-# Productos - Obtener por ID
+# Products - Get by ID
 GET http://localhost:8080/api/products/{id}
 Header: X-API-KEY: your-secret-api-key-here
 
-# Productos - Crear nuevo
+# Products - Create new
 POST http://localhost:8080/api/products
 Header: X-API-KEY: your-secret-api-key-here
 Content-Type: application/json
 
-# Productos - Actualizar
+# Products - Update
 PUT http://localhost:8080/api/products/{id}
 Header: X-API-KEY: your-secret-api-key-here
 Content-Type: application/json
 
-# Productos - Eliminar
+# Products - Delete
 DELETE http://localhost:8080/api/products/{id}
 Header: X-API-KEY: your-secret-api-key-here
 ```
 
-## 📋 Verificación Completa
+## 📋 Complete Verification
 
-### 1. Servicio Funcionando
+### 1. Service Running
 ```bash
 $ docker compose -f docker-compose.dev.yml ps
-# Estado: UP (healthy)
+# Status: UP (healthy)
 ```
 
 ### 2. Health Check
 ```bash
 $ curl localhost:8080/actuator/health
-# Respuesta: {"status":"UP","components":{"db":{"status":"UP"}...}}
+# Response: {"status":"UP","components":{"db":{"status":"UP"}...}}
 ```
 
-### 3. API Funcionando
+### 3. API Working
 ```bash
 $ curl -H "X-API-KEY: your-secret-api-key-here" localhost:8080/api/products
-# Respuesta: JSON:API con productos existentes
+# Response: JSON:API with existing products
 ```
 
-## 🔄 Para el Microservicio de Inventario
+## 🔄 For the Inventory Microservice
 
-El microservicio de inventario puede consumir este servicio de las siguientes maneras:
+The inventory microservice can consume this service in the following ways:
 
-### Opción 1: HTTP Client Directo (Recomendado)
+### Option 1: Direct HTTP Client (Recommended)
 ```java
-// Usar WebClient (ya incluido) o RestTemplate
+// Use WebClient (already included) or RestTemplate
 @Service
 public class ProductService {
     private final WebClient webClient;
@@ -90,33 +90,33 @@ public class ProductService {
 }
 ```
 
-### Opción 2: Service Discovery (Futuro)
-- Si necesitas service discovery más adelante, podemos agregar Eureka
-- Por ahora, usar URLs directas es más simple y efectivo
+### Option 2: Service Discovery (Future)
+- If you need service discovery later, we can add Eureka
+- For now, using direct URLs is simpler and more effective
 
-## 📚 Documentación de Integración
+## 📚 Integration Documentation
 
-1. **`MICROSERVICE_INTEGRATION.md`** - Guía completa de integración
-2. **`INTEGRATION_EXAMPLES.md`** - Ejemplos prácticos de uso
+1. **`MICROSERVICE_INTEGRATION.md`** - Complete integration guide
+2. **`INTEGRATION_EXAMPLES.md`** - Practical usage examples
 3. **Swagger UI** - http://localhost:8080/swagger-ui.html
 
-## 🚀 Siguiente Paso
+## 🚀 Next Step
 
-Tu microservicio está **listo para producción**. El equipo de inventario puede:
+Your microservice is **ready for production**. The inventory team can:
 
-1. **Revisar la documentación** en `MICROSERVICE_INTEGRATION.md`
-2. **Probar los endpoints** con los ejemplos proporcionados  
-3. **Implementar la integración** usando WebClient o RestTemplate
-4. **Usar el mismo patrón** de autenticación y formato JSON:API
+1. **Review the documentation** in `MICROSERVICE_INTEGRATION.md`
+2. **Test the endpoints** with the provided examples  
+3. **Implement the integration** using WebClient or RestTemplate
+4. **Use the same pattern** for authentication and JSON:API format
 
-## 💡 Beneficios de esta Arquitectura
+## 💡 Benefits of this Architecture
 
-- ✅ **Simple y directa** - Sin complejidad innecesaria
-- ✅ **Estándar de la industria** - JSON:API v1.1
-- ✅ **Segura** - Autenticación por API Key
-- ✅ **Monitoreable** - Health checks integrados
-- ✅ **Documentada** - Swagger automático
-- ✅ **Escalable** - Preparada para crecimiento
+- ✅ **Simple and direct** - No unnecessary complexity
+- ✅ **Industry standard** - JSON:API v1.1
+- ✅ **Secure** - API Key authentication
+- ✅ **Monitorable** - Integrated health checks
+- ✅ **Documented** - Automatic Swagger
+- ✅ **Scalable** - Prepared for growth
 
 ---
-**Estado:** ✅ **COMPLETADO** - Microservicio listo para integración con inventario
+**Status:** ✅ **COMPLETED** - Microservice ready for inventory integration

@@ -1,34 +1,44 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15-alpine
     container_name: postgres-db
     environment:
-      POSTGRES_DB: productdb
-      POSTGRES_USER: productuser
-      POSTGRES_PASSWORD: productpass
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    # Puerto solo interno - no expuesto al host para seguridad
+    # ports:
+    #   - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - backend-net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U productuser -d productdb"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 
   java-product-api:
     build: .
     container_name: java-product-api
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/productdb
-      SPRING_DATASOURCE_USERNAME: productuser
-      SPRING_DATASOURCE_PASSWORD: productpass
-      SPRING_PROFILES_ACTIVE: prod
-      APP_API_KEY: your-secret-api-key-here
+      SPRING_DATASOURCE_URL: ${DATABASE_URL}
+      SPRING_DATASOURCE_USERNAME: ${DATABASE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DATABASE_PASSWORD}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      APP_API_KEY: ${APP_API_KEY}
+      SERVER_PORT: ${SERVER_PORT:-8080}
+      JAVA_OPTS: ${JAVA_OPTS}
     ports:
       - "8080:8080"
     depends_on:
@@ -47,12 +57,22 @@ services:
       options:
         max-size: "200m"
         max-file: "10"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
 
   loki:
     image: grafana/loki:2.9.0
     container_name: loki
-    ports:
-      - "3100:3100"
+    # Puerto solo interno - no expuesto al host para seguridad
+    # ports:
+    #   - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./config/loki:/etc/loki
@@ -64,6 +84,15 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
 
   promtail:
     image: grafana/promtail:2.9.0
@@ -77,6 +106,15 @@ services:
       - backend-net
     depends_on:
       - loki
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
 
   grafana:
     image: grafana/grafana:10.1.0
@@ -84,7 +122,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
       GF_USERS_ALLOW_SIGN_UP: false
     volumes:
       - grafana_data:/var/lib/grafana
@@ -94,6 +132,15 @@ services:
       - backend-net
     depends_on:
       - loki
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
 
 networks:
   backend-net:
