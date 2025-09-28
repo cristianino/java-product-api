@@ -32,7 +32,7 @@ class ProductControllerV1Test {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final String API_KEY = "your-secret-api-key-here";
+    private final String API_KEY = "test-api-key";
 
     @Test
     void shouldCreateProductV1() throws Exception {
