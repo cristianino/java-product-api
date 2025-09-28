@@ -1,10 +1,10 @@
-# Ejemplos Prácticos - Integración Microservicio de Inventario
+# Practical Examples - Inventory Microservice Integration
 
-## 🎯 Casos de Uso Reales
+## 🎯 Real Use Cases
 
-### 1. Sincronización Inicial de Catálogo
+### 1. Initial Catalog Synchronization
 
-Cuando el microservicio de inventario se inicia, necesita sincronizar todos los productos:
+When the inventory microservice starts up, it needs to synchronize all products:
 
 ```java
 @Component
@@ -14,9 +14,9 @@ public class ProductCatalogSynchronizer {
     
     @EventListener(ApplicationReadyEvent.class)
     public void synchronizeProductCatalog() {
-        log.info("Iniciando sincronización de catálogo de productos...");
+        log.info("Starting product catalog synchronization...");
         
-        // Obtener todos los productos del microservicio de productos
+        // Get all products from the product microservice
         ProductListResponse products = productServiceClient
             .get()
             .uri("/api/internal/products")
@@ -24,33 +24,33 @@ public class ProductCatalogSynchronizer {
             .bodyToMono(ProductListResponse.class)
             .block();
             
-        // Crear registros de inventario para productos nuevos
+        // Create inventory records for new products
         products.getProducts().forEach(product -> {
             if (!inventoryExists(product.getId())) {
                 createInventoryRecord(product);
-                log.info("Creado inventario para producto: {}", product.getName());
+                log.info("Created inventory for product: {}", product.getName());
             }
         });
         
-        log.info("Sincronización completada. {} productos procesados", 
+        log.info("Synchronization completed. {} products processed", 
                  products.getTotalCount());
     }
 }
 ```
 
-### 2. Validación de Producto Antes de Crear Inventario
+### 2. Product Validation Before Creating Inventory
 
-Antes de crear un nuevo registro de inventario, validar que el producto existe:
+Before creating a new inventory record, validate that the product exists:
 
 ```java
 @Service
 public class InventoryService {
 
     public InventoryRecord createInventory(Long productId, int quantity) {
-        // 1. Verificar que el producto existe
+        // 1. Verify that the product exists
         ProductDto product = validateProductExists(productId);
         
-        // 2. Crear registro de inventario
+        // 2. Create inventory record
         InventoryRecord inventory = new InventoryRecord();
         inventory.setProductId(productId);
         inventory.setProductName(product.getName());
@@ -69,23 +69,23 @@ public class InventoryService {
                 .bodyToMono(ProductDto.class)
                 .block();
         } catch (WebClientResponseException.NotFound e) {
-            throw new ProductNotFoundException("Producto no encontrado: " + productId);
+            throw new ProductNotFoundException("Product not found: " + productId);
         }
     }
 }
 ```
 
-### 3. Actualización Periódica de Disponibilidad
+### 3. Periodic Availability Updates
 
-Sincronizar periódicamente la disponibilidad de productos:
+Periodically synchronize product availability:
 
 ```java
 @Component
 public class ProductAvailabilityUpdater {
 
-    @Scheduled(fixedDelay = 300000) // Cada 5 minutos
+    @Scheduled(fixedDelay = 300000) // Every 5 minutes
     public void updateProductAvailability() {
-        log.debug("Actualizando disponibilidad de productos...");
+        log.debug("Updating product availability...");
         
         List<InventoryRecord> inventories = inventoryRepository.findAll();
         
@@ -101,11 +101,11 @@ public class ProductAvailabilityUpdater {
                 if (inventory.isAvailable() != availability.isAvailable()) {
                     inventory.setAvailable(availability.isAvailable());
                     inventoryRepository.save(inventory);
-                    log.info("Actualizada disponibilidad del producto {}: {}", 
+                    log.info("Updated availability for product {}: {}", 
                              inventory.getProductId(), availability.isAvailable());
                 }
             } catch (Exception e) {
-                log.error("Error actualizando disponibilidad del producto {}: {}", 
+                log.error("Error updating availability for product {}: {}", 
                           inventory.getProductId(), e.getMessage());
             }
         });
@@ -113,16 +113,16 @@ public class ProductAvailabilityUpdater {
 }
 ```
 
-### 4. Operación Batch para Múltiples Productos
+### 4. Batch Operation for Multiple Products
 
-Cuando necesitas información de varios productos a la vez:
+When you need information for several products at once:
 
 ```java
 @Service
 public class BulkInventoryService {
 
     public List<InventoryDto> getInventoryForProducts(List<Long> productIds) {
-        // 1. Obtener información de productos en batch
+        // 1. Get product information in batch
         BatchProductRequest request = new BatchProductRequest();
         request.setProductIds(productIds);
         
@@ -134,7 +134,7 @@ public class BulkInventoryService {
             .bodyToMono(ProductListResponse.class)
             .block();
         
-        // 2. Combinar con información de inventario local
+        // 2. Combine with local inventory information
         return products.getProducts().stream()
             .map(product -> {
                 InventoryRecord inventory = inventoryRepository
@@ -154,9 +154,9 @@ public class BulkInventoryService {
 }
 ```
 
-## 🛠️ Configuración WebClient
+## 🛠️ WebClient Configuration
 
-### Configuración Básica
+### Basic Configuration
 
 ```java
 @Configuration
@@ -179,7 +179,7 @@ public class ProductServiceConfig {
 }
 ```
 
-### Configuración Avanzada con Resilience4j
+### Advanced Configuration with Resilience4j
 
 ```java
 @Configuration
@@ -210,14 +210,14 @@ public class ResilientProductServiceConfig {
 }
 ```
 
-## 📝 DTOs del Microservicio de Inventario
+## 📝 Inventory Microservice DTOs
 
 ```java
-// Respuesta del servicio de productos
+// Product service response
 public class ProductListResponse {
     private List<ProductDto> products;
     private int totalCount;
-    // getters y setters
+    // getters and setters
 }
 
 public class ProductDto {
@@ -225,25 +225,25 @@ public class ProductDto {
     private String name;
     private BigDecimal price;
     private boolean availability;
-    // getters y setters
+    // getters and setters
 }
 
 public class AvailabilityResponse {
     private Long productId;
     private boolean available;
-    // getters y setters
+    // getters and setters
 }
 
-// Request para operaciones batch
+// Request for batch operations
 public class BatchProductRequest {
     private List<Long> productIds;
-    // getters y setters
+    // getters and setters
 }
 ```
 
-## 🧪 Ejemplos de Testing
+## 🧪 Testing Examples
 
-### Test de Integración
+### Integration Test
 
 ```java
 @SpringBootTest
@@ -283,7 +283,7 @@ class ProductServiceIntegrationTest {
 }
 ```
 
-### Test con WireMock
+### Test with WireMock
 
 ```java
 @SpringBootTest
@@ -296,52 +296,52 @@ class ProductServiceMockTest {
 
     @Test
     void shouldHandleProductNotFound() {
-        // Configurar mock
+        // Configure mock
         wireMock.stubFor(get(urlEqualTo("/api/internal/products/999"))
             .willReturn(aResponse().withStatus(404)));
         
-        // Verificar manejo de error
+        // Verify error handling
         assertThatThrownBy(() -> productService.getProductById(999L))
             .isInstanceOf(ProductNotFoundException.class);
     }
 }
 ```
 
-## 🚀 Comandos de Prueba Rápida
+## 🚀 Quick Test Commands
 
-### Verificar conectividad
+### Verify connectivity
 ```bash
-# Test básico de conectividad
+# Basic connectivity test
 curl -f -H "X-API-Key: your-secret-api-key-here" \
      http://localhost:8080/actuator/health
 
-# Obtener productos
+# Get products
 curl -H "X-API-Key: your-secret-api-key-here" \
      -H "Content-Type: application/json" \
      http://localhost:8080/api/internal/products | jq '.'
 ```
 
-### Script de inicialización para desarrollo
+### Development initialization script
 ```bash
 #!/bin/bash
-echo "Iniciando microservicio de productos..."
+echo "Starting product microservice..."
 docker compose -f docker-compose.dev.yml up -d
 
-echo "Esperando que el servicio esté listo..."
+echo "Waiting for service to be ready..."
 until curl -f -s -H "X-API-Key: your-secret-api-key-here" \
            http://localhost:8080/actuator/health > /dev/null; do
     sleep 2
 done
 
-echo "✅ Microservicio de productos listo para integraciones"
+echo "✅ Product microservice ready for integrations"
 ```
 
-## 📋 Checklist de Integración
+## 📋 Integration Checklist
 
-- [ ] Configurar WebClient con URL y API key correctas
-- [ ] Implementar manejo de errores (404, 500, timeouts)
-- [ ] Configurar circuit breaker y retry policies  
-- [ ] Crear tests de integración
-- [ ] Configurar logging para debugging
-- [ ] Documentar endpoints usados
-- [ ] Validar performance con carga esperada
+- [ ] Configure WebClient with correct URL and API key
+- [ ] Implement error handling (404, 500, timeouts)
+- [ ] Configure circuit breaker and retry policies  
+- [ ] Create integration tests
+- [ ] Configure logging for debugging
+- [ ] Document used endpoints
+- [ ] Validate performance with expected load
