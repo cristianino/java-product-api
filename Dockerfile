@@ -1,35 +1,40 @@
-# Build stage
+# ---------- Build stage ----------
 FROM maven:3-openjdk-17 AS build
-
 WORKDIR /app
 
-# Copy pom.xml and download dependencies
+# Cache deps
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+RUN mvn -B dependency:go-offline
 
-# Copy source code and build
+# Build
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn -B clean package -DskipTests
 
-# Runtime stage
-FROM openjdk:17-jdk-slim
+# ---------- Runtime stage ----------
+FROM eclipse-temurin:17.0.12_7-jre-alpine
 
-# Install curl for health checks
-RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+# Alpine usa apk (no apt)
+RUN apk add --no-cache curl tzdata
+
+# Zona horaria (opcional)
+ENV TZ=America/Bogota
+
+# Perfil y workaround Micrometer/cgroups
+ENV SPRING_PROFILES_ACTIVE=prod
+ENV JAVA_TOOL_OPTIONS="-Dmanagement.metrics.binders.processor.enabled=false"
 
 WORKDIR /app
+COPY --from=build /app/target/java-product-api-*.jar /app/app.jar
 
-# Copy the built jar
-COPY --from=build /app/target/java-product-api-*.jar app.jar
-
-# Create non-root user
-RUN addgroup --system appgroup && adduser --system --group appuser
-RUN chown -R appuser:appgroup /app
+# Usuario no root en Alpine
+RUN addgroup -S app && adduser -S appuser -G app \
+ && chown -R appuser:app /app
 USER appuser
 
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=5 \
+  CMD curl -fsS http://localhost:8080/actuator/health | grep -q '"status":"UP"' || exit 1
 
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-Djava.security.egd=file:/dev/./urandom", "-Dmanagement.metrics.export.defaults.enabled=false", "-Dmanagement.endpoint.metrics.enabled=false", "-jar", "app.jar"]
+# Flags JVM: elimina UseContainerSupport (deprecado en 15+)
+ENTRYPOINT ["java","-jar","/app/app.jar"]
